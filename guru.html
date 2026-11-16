@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Guru & Mapel - CBT SMAN 1 Tebing Tinggi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Pustaka SheetJS untuk Excel (.xlsx) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Kontainer Utama -->
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- SIDEBAR (Navigasi Kiri) -->
+        <aside id="sidebar" class="w-64 bg-slate-800 text-white flex flex-col justify-between shrink-0 z-20 shadow-xl sidebar-transition overflow-hidden">
+            <div>
+                <!-- Header Sidebar -->
+                <div class="h-16 flex items-center justify-center border-b border-slate-700 bg-slate-900 whitespace-nowrap">
+                    <i class="fa-solid fa-graduation-cap text-2xl text-teal-400"></i>
+                    <h1 id="sidebar-logo-text" class="text-lg font-bold tracking-wider ml-2 sidebar-text">CBT SMAN 1 TT</h1>
+                </div>
+                
+                <!-- Navigasi Menu -->
+                <nav class="py-4 space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)] custom-scrollbar">
+                    
+                    <!-- KATEGORI 1: MENU UTAMA -->
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-2 truncate">Menu Utama</p>
+                    
+                    <a href="dashboard.html" class="w-full flex items-center px-6 py-3 bg-blue-600 text-white shadow-md text-left font-semibold">
+                        <i class="fa-solid fa-gauge-high w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Dashboard</span>
+                    </a>
+                    <a href="paket_soal.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Paket & Bank Soal">
+                        <i class="fa-solid fa-folder-open w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Paket & Bank Soal</span>
+                    </a>
+                    <a href="sesi.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Sesi Ujian & Token">
+                        <i class="fa-solid fa-clock w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Sesi Ujian & Token</span>
+                    </a>
+
+                    <!-- KATEGORI 2: PELAKSANAAN & EVALUASI -->
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-amber-400 uppercase tracking-wider mt-6 mb-2 truncate">Pelaksanaan & Evaluasi</p>
+                    
+                    <a href="monitor.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Monitoring Live">
+                        <i class="fa-solid fa-desktop w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Monitoring Live</span>
+                    </a>
+                    <a href="penilaian.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Penilaian & Hasil">
+                        <i class="fa-solid fa-square-poll-vertical w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Penilaian & Hasil</span>
+                    </a>
+
+                    <!-- KATEGORI 3: AREA ADMIN -->
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-emerald-400 uppercase tracking-wider mt-6 mb-2 truncate">Area Admin</p>
+                    
+                    <a href="siswa.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Data Siswa & Kelas">
+                        <i class="fa-solid fa-users w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Data Siswa & Kelas</span>
+                    </a>
+                    <a href="guru.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Data Guru & Mapel">
+                        <i class="fa-solid fa-chalkboard-user w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Data Guru & Mapel</span>
+                    </a>
+                    <a href="pengaturan.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Pengaturan Sistem">
+                        <i class="fa-solid fa-gears w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Pengaturan Sistem</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Tombol Keluar -->
+            <div class="p-4 border-t border-slate-700 bg-slate-900 shrink-0">
+                <button type="button" onclick="logoutAdmin()" class="w-full flex items-center justify-center p-2.5 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold transition-colors shadow-sm cursor-pointer" title="Keluar">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span class="sidebar-text ml-2 whitespace-nowrap">Keluar</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Area Konten Utama -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-gray-50">
+            
+            <header class="h-16 bg-white shadow-sm flex items-center justify-between px-8 z-10 shrink-0">
+                <div class="flex items-center">
+                    <h2 class="text-xl font-bold text-gray-800">Manajemen Data Guru & Pengampu</h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-right hidden sm:block">
+                        <p id="admin-name" class="text-sm font-bold text-gray-800">Memuat...</p>
+                        <p class="text-xs text-blue-600 font-semibold uppercase">Administrator</p>
+                    </div>
+                    <div class="w-10 h-10 bg-slate-100 text-slate-600 rounded-full flex items-center justify-center text-lg font-bold border-2 border-slate-200">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-8 space-y-6">
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Daftar Pendidik & Staf Pengelola SMAN 1 Tebing Tinggi</h3>
+                        <p class="text-sm text-gray-500">Kelola akun akses untuk Guru, Proktor, dan Administrator sistem CBT.</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button type="button" onclick="bukaModalImport()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm cursor-pointer flex items-center space-x-2">
+                            <i class="fa-solid fa-file-excel"></i>
+                            <span>Import Excel</span>
+                        </button>
+                        <button type="button" onclick="bukaModalGuru()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm cursor-pointer flex items-center space-x-2">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>Tambah Akun Guru</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabel Data Guru & Kontrol Filter -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center space-x-3 w-full md:w-auto">
+                            <h4 class="font-bold text-gray-800 whitespace-nowrap">Daftar Pengguna</h4>
+                            <span id="counter-guru" class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded-full">0 Akun</span>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+                            <!-- Input Pencarian -->
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                                </span>
+                                <input type="text" id="input-pencarian" onkeyup="muatDataGuru()" placeholder="Cari nama / email..." class="bg-white border border-gray-300 rounded-lg pl-9 pr-3 py-1.5 text-xs font-semibold text-gray-800 outline-none focus:ring-2 focus:ring-blue-500 w-48">
+                            </div>
+
+                            <!-- Filter Berdasarkan Peran (Role) -->
+                            <div class="flex items-center space-x-2">
+                                <label class="text-xs font-bold text-gray-600 uppercase">Peran:</label>
+                                <select id="filter-role" onchange="muatDataGuru()" class="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-800 outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="ALL">Semua Peran</option>
+                                    <option value="admin">Administrator</option>
+                                    <option value="proktor">Proktor</option>
+                                    <option value="guru">Guru Mapel</option>
+                                </select>
+                            </div>
+
+                            <!-- Limit Tampilkan Baris -->
+                            <div class="flex items-center space-x-2">
+                                <label class="text-xs font-bold text-gray-600 uppercase">Tampilkan:</label>
+                                <select id="limit-tampil" onchange="muatDataGuru()" class="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-800 outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="30">30</option>
+                                    <option value="ALL">Semua</option>
+                                </select>
+                            </div>
+
+                            <button type="button" onclick="muatDataGuru()" class="bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer" title="Refresh Data">
+                                <i class="fa-solid fa-rotate"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-xs text-gray-500 uppercase tracking-wider border-b border-gray-200 bg-white">
+                                    <th class="px-6 py-4 font-semibold">Nama Lengkap</th>
+                                    <th class="px-6 py-4 font-semibold">Email / Akun</th>
+                                    <th class="px-6 py-4 font-semibold">Peran (Role)</th>
+                                    <th class="px-6 py-4 font-semibold text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabel-guru-body" class="text-sm divide-y divide-gray-100">
+                                <tr><td colspan="4" class="py-8 text-center text-gray-400 italic">Memuat data dari database...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL TAMBAH GURU SATUAN -->
+    <div id="modal-guru" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl my-8">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-chalkboard-user text-blue-600 mr-2"></i> Tambah Akun Guru / Pengelola</h3>
+                <button type="button" onclick="tutupModalGuru()" class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer">&times;</button>
+            </div>
+            
+            <form id="form-tambah-guru" class="space-y-4" onsubmit="simpanGuru(event)">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nama Lengkap & Gelar</label>
+                    <input type="text" id="guru-nama" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none font-semibold text-gray-800" placeholder="Contoh: Rully Firmansyah, S.Pd." required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Alamat Email</label>
+                    <input type="email" id="guru-email" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none font-semibold text-gray-800" placeholder="email@sekolah.sch.id" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Peran Akses (Role)</label>
+                    <select id="guru-role" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none font-semibold text-gray-800" required>
+                        <option value="guru">Guru (Pembuat Soal & Penilai)</option>
+                        <option value="proktor">Proktor (Pengawas Ujian)</option>
+                        <option value="admin">Administrator (Akses Penuh)</option>
+                    </select>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-3 border-t">
+                    <button type="button" onclick="tutupModalGuru()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-semibold cursor-pointer">Batal</button>
+                    <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold shadow-md shadow-blue-500/20 cursor-pointer">Simpan Akun</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL IMPORT EXCEL GURU -->
+    <div id="modal-import" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl my-8">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-file-excel text-emerald-600 mr-2"></i> Import Data Guru dari Excel</h3>
+                <button type="button" onclick="tutupModalImport()" class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer">&times;</button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-blue-900">Belum punya format Excel?</p>
+                        <p class="text-[11px] text-blue-700">Unduh template Excel resmi siap isi untuk data guru.</p>
+                    </div>
+                    <button type="button" onclick="downloadTemplateGuruExcel()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-sm transition-colors cursor-pointer flex items-center space-x-1.5">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Download Template Excel</span>
+                    </button>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Pilih File Excel (.xlsx / .xls)</label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-emerald-500 transition-colors bg-gray-50">
+                        <input type="file" id="file-excel-guru" accept=".xlsx, .xls, .csv" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-3 border-t">
+                <button type="button" onclick="tutupModalImport()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-semibold cursor-pointer">Batal</button>
+                <button type="button" onclick="prosesUploadGuruExcel()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow-md shadow-emerald-500/20 cursor-pointer">Upload & Simpan Data</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script>
+        const sessionData = localStorage.getItem('userLogin');
+        if (!sessionData) {
+            alert("Akses ditolak! Silakan login terlebih dahulu.");
+            window.location.href = "login.html";
+        } else {
+            const user = JSON.parse(sessionData);
+            if (user.role !== 'admin') { window.location.replace("dashboard_guru.html"); }
+            document.getElementById('admin-name').innerText = user.nama_lengkap;
+            muatDataGuru();
+        }
+
+        function bukaModalGuru() { document.getElementById('modal-guru').classList.remove('hidden'); }
+        function tutupModalGuru() { 
+            document.getElementById('modal-guru').classList.add('hidden'); 
+            document.getElementById('form-tambah-guru').reset();
+        }
+
+        function bukaModalImport() { document.getElementById('modal-import').classList.remove('hidden'); }
+        function tutupModalImport() { 
+            document.getElementById('modal-import').classList.add('hidden'); 
+            document.getElementById('file-excel-guru').value = '';
+        }
+
+        // 1. Download Template Excel Guru
+        function downloadTemplateGuruExcel() {
+            const templateData = [
+                { Nama_Lengkap: "Rully Firmansyah, S.Pd.", Email: "rully@sekolah.sch.id", Role: "admin" },
+                { Nama_Lengkap: "Ahmad Guru Matematika, S.Pd.", Email: "matematika@sekolah.sch.id", Role: "guru" },
+                { Nama_Lengkap: "Siti Proktor Ujian", Email: "proktor@sekolah.sch.id", Role: "proktor" }
+            ];
+
+            const worksheet = XLSX.utils.json_to_sheet(templateData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Data Guru");
+            XLSX.writeFile(workbook, "template_guru_sman1.xlsx");
+        }
+
+        // 2. Upload dan Simpan Excel Guru
+        async function prosesUploadGuruExcel() {
+            const fileInput = document.getElementById('file-excel-guru');
+            if (fileInput.files.length === 0) {
+                alert("Silakan pilih file Excel terlebih dahulu!");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonRows = XLSX.utils.sheet_to_json(worksheet);
+
+                    if (jsonRows.length === 0) {
+                        alert("File Excel kosong atau format tidak sesuai.");
+                        return;
+                    }
+
+                    let dataUntukDisimpan = jsonRows.map(row => ({
+                        nama_lengkap: String(row.Nama_Lengkap || row.nama_lengkap || row.NAMA || '').trim(),
+                        email: String(row.Email || row.email || '').trim().toLowerCase(),
+                        role: String(row.Role || row.role || 'guru').trim().toLowerCase()
+                    })).filter(g => g.nama_lengkap && g.email);
+
+                    if (dataUntukDisimpan.length === 0) {
+                        alert("Tidak ada data valid yang ditemukan dalam file Excel.");
+                        return;
+                    }
+
+                    if (confirm(`Akan mengimpor ${dataUntukDisimpan.length} data guru/pengguna?`)) {
+                        const { error } = await db.from('users').insert(dataUntukDisimpan);
+                        if (error) {
+                            alert("Gagal menyimpan ke database. Kemungkinan email sudah terdaftar.");
+                            console.error(error);
+                        } else {
+                            alert(`Berhasil mengimpor ${dataUntukDisimpan.length} data pengguna!`);
+                            tutupModalImport();
+                            muatDataGuru();
+                        }
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Terjadi kesalahan saat membaca file Excel.");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Simpan Guru Satuan
+        async function simpanGuru(e) {
+            e.preventDefault();
+            const nama_lengkap = document.getElementById('guru-nama').value.trim();
+            const email = document.getElementById('guru-email').value.trim().toLowerCase();
+            const role = document.getElementById('guru-role').value;
+
+            try {
+                const { error } = await db.from('users').insert([{ nama_lengkap, email, role }]);
+                if (error) {
+                    alert("Gagal menyimpan akun. Kemungkinan email sudah terdaftar.");
+                    console.error(error);
+                } else {
+                    alert("Akun guru/pengelola berhasil disimpan!");
+                    tutupModalGuru();
+                    muatDataGuru();
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        // Muat Data Guru dengan Filter, Pencarian, & Limit
+        async function muatDataGuru() {
+            const tbody = document.getElementById('tabel-guru-body');
+            const counterBadge = document.getElementById('counter-guru');
+            const keyword = document.getElementById('input-pencarian').value.trim().toLowerCase();
+            const roleDipilih = document.getElementById('filter-role').value;
+            const limitDipilih = document.getElementById('limit-tampil').value;
+
+            tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-gray-400 italic">Memuat data pengguna...</td></tr>`;
+
+            try {
+                let query = db.from('users').select('*').order('nama_lengkap', { ascending: true });
+
+                if (roleDipilih !== 'ALL') {
+                    query = query.eq('role', roleDipilih);
+                }
+
+                if (limitDipilih !== 'ALL') {
+                    query = query.limit(parseInt(limitDipilih));
+                }
+
+                let { data, error } = await query;
+
+                if (error) {
+                    console.error(error);
+                    tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-red-500">Gagal memuat data dari database.</td></tr>`;
+                    return;
+                }
+
+                // Filter pencarian nama/email secara client-side
+                if (keyword) {
+                    data = data.filter(u => 
+                        u.nama_lengkap.toLowerCase().includes(keyword) || 
+                        u.email.toLowerCase().includes(keyword)
+                    );
+                }
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-gray-400 italic">Tidak ada data pengguna yang ditemukan.</td></tr>`;
+                    counterBadge.innerText = `0 Akun`;
+                    return;
+                }
+
+                counterBadge.innerText = `${data.length} Akun Ditampilkan`;
+                tbody.innerHTML = "";
+
+                data.forEach((u) => {
+                    let badgeRole = u.role === 'admin' 
+                        ? `<span class="bg-red-100 text-red-800 px-2.5 py-1 rounded-md text-xs font-bold uppercase">Administrator</span>`
+                        : u.role === 'proktor'
+                        ? `<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md text-xs font-bold uppercase">Proktor</span>`
+                        : `<span class="bg-blue-100 text-blue-800 px-2.5 py-1 rounded-md text-xs font-bold uppercase">Guru Mapel</span>`;
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 font-bold text-gray-800">${u.nama_lengkap}</td>
+                            <td class="px-6 py-4 font-mono text-gray-600">${u.email}</td>
+                            <td class="px-6 py-4">${badgeRole}</td>
+                            <td class="px-6 py-4 text-right space-x-1">
+                                <button type="button" onclick="resetPasswordGuru('${u.id}', '${u.nama_lengkap}')" class="w-8 h-8 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white transition-colors cursor-pointer inline-flex items-center justify-center" title="Reset Password">
+                                    <i class="fa-solid fa-key text-xs"></i>
+                                </button>
+                                <button type="button" onclick="editRoleGuru('${u.id}', '${u.nama_lengkap}', '${u.role}')" class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors cursor-pointer inline-flex items-center justify-center" title="Ubah Peran / Role">
+                                    <i class="fa-solid fa-user-pen text-xs"></i>
+                                </button>
+                                <button type="button" onclick="hapusGuru('${u.id}')" class="w-8 h-8 rounded-full bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors cursor-pointer inline-flex items-center justify-center" title="Hapus Akun">
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) { console.error(err); }
+        }
+
+        // Fitur Ubah Role / Peran Pengguna
+        // Fitur Reset Password Guru oleh Admin
+        async function resetPasswordGuru(id, nama) {
+            const passwordBaru = prompt(`Masukkan password baru untuk akun [ ${nama} ]:`);
+            if (passwordBaru !== null) {
+                if (passwordBaru.trim() === "") {
+                    alert("Password tidak boleh kosong!");
+                    return;
+                }
+
+                // Mengupdate password pada tabel users (pastikan kolom password tersedia di database Anda)
+                const { error } = await db.from('users').update({ password: passwordBaru.trim() }).eq('id', id);
+                if (error) {
+                    console.error(error);
+                    alert("Gagal mereset password. Pastikan kolom 'password' sudah ada di tabel users Supabase.");
+                } else {
+                    alert(`Password untuk ${nama} berhasil direset menjadi: "${passwordBaru.trim()}"`);
+                }
+            }
+        }
+
+        async function editRoleGuru(id, nama, roleLama) {
+            const roleBaru = prompt(`Ubah peran untuk [ ${nama} ]\nPilih: admin, proktor, atau guru`, roleLama);
+            if (roleBaru !== null) {
+                const roleTrim = roleBaru.trim().toLowerCase();
+                if (['admin', 'proktor', 'guru'].includes(roleTrim)) {
+                    const { error } = await db.from('users').update({ role: roleTrim }).eq('id', id);
+                    if (error) {
+                        alert("Gagal memperbarui peran.");
+                    } else {
+                        alert(`Peran ${nama} berhasil diubah menjadi ${roleTrim.toUpperCase()}!`);
+                        muatDataGuru();
+                    }
+                } else {
+                    alert("Peran tidak valid! Masukkan hanya: admin, proktor, atau guru.");
+                }
+            }
+        }
+
+        async function hapusGuru(id) {
+            if (confirm("Apakah Bapak yakin ingin menghapus akun pengelola ini?")) {
+                await db.from('users').delete().eq('id', id);
+                muatDataGuru();
+            }
+        }
+
+        function logoutAdmin() {
+            if (confirm("Keluar dari sistem?")) {
+                localStorage.removeItem('userLogin');
+                window.location.href = "login.html";
+            }
+        }
+        
+    </script>
+</body>
+</html>

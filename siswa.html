@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Siswa - CBT SMAN 1 Tebing Tinggi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style> 
+        body { font-family: 'Inter', sans-serif; } 
+        
+        /* CSS Khusus untuk Mode Cetak (Print) */
+        @media print {
+            #app-container,
+            #modal-siswa,
+            #modal-cetak,
+            #modal-import {
+                display: none !important;
+            }
+            #print-area {
+                display: block !important;
+                width: 100% !important;
+                padding: 0 !important;
+            }
+            body {
+                background-color: #ffffff !important;
+            }
+            .cetak-kartu { 
+                break-inside: avoid;
+                page-break-inside: avoid;
+                border: 1.5px solid #0f172a;
+                border-radius: 10px;
+            }
+            @page {
+                margin: 0.8cm;
+                size: A4;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Kontainer Utama -->
+    <div id="app-container" class="flex h-screen overflow-hidden">
+
+        <!-- SIDEBAR (Navigasi Kiri) -->
+        <aside id="sidebar" class="w-64 bg-slate-800 text-white flex flex-col justify-between shrink-0 z-20 shadow-xl sidebar-transition overflow-hidden">
+            <div>
+                <!-- Header Sidebar -->
+                <div class="h-16 flex items-center justify-center border-b border-slate-700 bg-slate-900 whitespace-nowrap">
+                    <i class="fa-solid fa-graduation-cap text-2xl text-teal-400"></i>
+                    <h1 id="sidebar-logo-text" class="text-lg font-bold tracking-wider ml-2 sidebar-text">CBT SMAN 1 TT</h1>
+                </div>
+                
+                <!-- Navigasi Menu -->
+                <nav class="py-4 space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)] custom-scrollbar">
+                    
+                    <!-- KATEGORI 1: MENU UTAMA -->
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-2 truncate">Menu Utama</p>
+                    
+                    <a href="dashboard.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Dashboard">
+                        <i class="fa-solid fa-gauge-high w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Dashboard</span>
+                    </a>
+                    <a href="paket_soal.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Paket & Bank Soal">
+                        <i class="fa-solid fa-folder-open w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Paket & Bank Soal</span>
+                    </a>
+                    <a href="sesi.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Sesi Ujian & Token">
+                        <i class="fa-solid fa-clock w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Sesi Ujian & Token</span>
+                    </a>
+
+                    <!-- KATEGORI 2: PELAKSANAAN & EVALUASI -->
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-amber-400 uppercase tracking-wider mt-6 mb-2 truncate">Pelaksanaan & Evaluasi</p>
+                    
+                    <a href="monitor.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Monitoring Live">
+                        <i class="fa-solid fa-desktop w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Monitoring Live</span>
+                    </a>
+                    <a href="penilaian.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Penilaian & Hasil">
+                        <i class="fa-solid fa-square-poll-vertical w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Penilaian & Hasil</span>
+                    </a>
+
+                    <!-- KATEGORI 3: AREA ADMIN -->
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-emerald-400 uppercase tracking-wider mt-6 mb-2 truncate">Area Admin</p>
+                    
+                    <a href="siswa.html" class="w-full flex items-center px-6 py-3 bg-blue-600 text-white shadow-md text-left font-semibold" title="Data Siswa & Kelas">
+                        <i class="fa-solid fa-users w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Data Siswa & Kelas</span>
+                    </a>
+                    <a href="guru.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Data Guru & Mapel">
+                        <i class="fa-solid fa-chalkboard-user w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Data Guru & Mapel</span>
+                    </a>
+                    <a href="pengaturan.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Pengaturan Sistem">
+                        <i class="fa-solid fa-gears w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Pengaturan Sistem</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Tombol Keluar -->
+            <div class="p-4 border-t border-slate-700 bg-slate-900 shrink-0">
+                <button type="button" onclick="logoutAdmin()" class="w-full flex items-center justify-center p-2.5 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold transition-colors shadow-sm cursor-pointer" title="Keluar">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span class="sidebar-text ml-2 whitespace-nowrap">Keluar</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Konten Utama -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-gray-50">
+            <header class="h-16 bg-white shadow-sm flex items-center justify-between px-8 z-10 shrink-0">
+                <div class="flex items-center">
+                    <h2 class="text-xl font-bold text-gray-800">Manajemen Data Siswa</h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-right hidden sm:block">
+                        <p id="admin-name" class="text-sm font-bold text-gray-800">Memuat...</p>
+                        <p id="admin-role-badge" class="text-xs text-blue-600 font-semibold uppercase">Administrator</p>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-8 space-y-6">
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Database Peserta Ujian CBT</h3>
+                        <p class="text-sm text-gray-500">Kelola data siswa, import masal, dan cetak kartu ujian peserta.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button type="button" onclick="bukaModalCetakKartu()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm cursor-pointer flex items-center space-x-2">
+                            <i class="fa-solid fa-print"></i>
+                            <span>Cetak Kartu Ujian</span>
+                        </button>
+                        <button type="button" onclick="bukaModalImport()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm cursor-pointer flex items-center space-x-2">
+                            <i class="fa-solid fa-file-excel"></i>
+                            <span>Import Excel</span>
+                        </button>
+                        <button type="button" onclick="bukaModalSiswa()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm cursor-pointer flex items-center space-x-2">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Tambah Siswa</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabel Data Siswa -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                        <div class="flex items-center space-x-3">
+                            <h4 class="font-bold text-gray-800">Daftar Siswa</h4>
+                            <span id="counter-siswa" class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-0.5 rounded-full">0 Siswa</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-xs font-bold text-gray-600 uppercase">Filter Kelas:</label>
+                            <select id="filter-kelas" onchange="muatDataSiswa()" class="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-800 outline-none">
+                                <option value="ALL">Semua Kelas</option>
+                                <option value="X">Kelas X</option>
+                                <option value="XI">Kelas XI</option>
+                                <option value="XII">Kelas XII</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-xs text-gray-500 uppercase tracking-wider border-b border-gray-200 bg-white">
+                                    <th class="px-6 py-4 font-semibold">NISN (Username)</th>
+                                    <th class="px-6 py-4 font-semibold">Nama Lengkap</th>
+                                    <th class="px-6 py-4 font-semibold">Kelas</th>
+                                    <th class="px-6 py-4 font-semibold">Password Ujian</th>
+                                    <th class="px-6 py-4 font-semibold text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabel-siswa-body" class="text-sm divide-y divide-gray-100">
+                                <tr><td colspan="5" class="py-8 text-center text-gray-400 italic">Memuat data siswa...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- AREA CETAK KARTU (Otomatis muncul saat dicetak) -->
+    <div id="print-area" class="hidden bg-white min-h-screen p-4">
+        <div id="print-grid" class="grid grid-cols-2 gap-3.5">
+            <!-- Kartu peserta digenerate otomatis di sini -->
+        </div>
+    </div>
+
+    <!-- MODAL TAMBAH/EDIT SISWA -->
+    <div id="modal-siswa" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 id="modal-title" class="text-lg font-bold text-gray-800">Tambah Siswa Baru</h3>
+                <button type="button" onclick="tutupModalSiswa()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+            </div>
+            <form id="form-siswa" class="space-y-4" onsubmit="simpanSiswa(event)">
+                <input type="hidden" id="siswa-id">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">NISN (Sbg Username)</label>
+                    <input type="text" id="siswa-nisn" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nama Lengkap</label>
+                    <input type="text" id="siswa-nama" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Kelas (Gunakan Format Standar)</label>
+                    <input type="text" id="siswa-kelas" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none" placeholder="Contoh: X A" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Password Ujian</label>
+                    <input type="text" id="siswa-pass" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none font-mono" required>
+                </div>
+                <div class="flex justify-end pt-3 border-t">
+                    <button type="button" onclick="tutupModalSiswa()" class="px-4 py-2 mr-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-semibold">Batal</button>
+                    <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold">Simpan Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PENGATURAN & CETAK KARTU UJIAN (LENGKAP DENGAN LOGO & TTD OPSIONAL) -->
+    <div id="modal-cetak" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-4 max-h-[92vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center border-b pb-3">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-id-card text-indigo-600 mr-2"></i>Cetak Kartu Peserta Ujian</h3>
+                    <p class="text-xs text-gray-500">Atur kelas, keterangan asesmen, logo sekolah, tanggal, dan tanda tangan proktor.</p>
+                </div>
+                <button type="button" onclick="tutupModalCetak()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none">&times;</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                <!-- Kolom Kiri -->
+                <div class="md:col-span-7 space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Pilih Kelas yang Dicetak</label>
+                        <select id="pilih-kelas-cetak" class="w-full bg-indigo-50/60 border border-indigo-200 rounded-xl px-3 py-2 text-sm font-bold text-indigo-950 outline-none focus:border-indigo-500"></select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Keterangan Asesmen & Semester</label>
+                        <input type="text" id="cetak-asesmen" oninput="simpanPreferensiCetak()" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-gray-800 outline-none focus:border-indigo-500">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Tempat & Tanggal</label>
+                            <input type="text" id="cetak-tanggal" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-gray-800 outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Jabatan Penandatangan</label>
+                            <input type="text" id="cetak-jabatan" oninput="simpanPreferensiCetak()" value="Proktor / Panitia Ujian," class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-gray-800 outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nama Proktor (Opsional)</label>
+                            <input type="text" id="cetak-nama-proktor" oninput="simpanPreferensiCetak()" placeholder="Kosongkan untuk titik-titik" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-gray-800 outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">NIP (Opsional)</label>
+                            <input type="text" id="cetak-nip-proktor" oninput="simpanPreferensiCetak()" placeholder="Kosongkan jika tidak ada" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs sm:text-sm text-gray-800 outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+
+                    <!-- Pengaturan Logo Opsional -->
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 flex flex-wrap items-center justify-between gap-2">
+                        <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-gray-700">
+                            <input type="checkbox" id="chk-cetak-logo" checked onchange="simpanPreferensiCetak()" class="w-4 h-4 text-indigo-600 rounded">
+                            <span>Tampilkan Logo Sekolah</span>
+                        </label>
+                        <div class="flex items-center gap-2">
+                            <label class="text-[11px] bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-semibold px-2.5 py-1 rounded-lg cursor-pointer">
+                                <i class="fa-solid fa-image mr-1 text-indigo-600"></i> Upload Logo
+                                <input type="file" accept="image/*" onchange="uploadLogoKartu(event)" class="hidden">
+                            </label>
+                            <button type="button" onclick="resetLogoKartu()" class="text-[11px] text-gray-500 hover:text-gray-800 underline cursor-pointer">Default</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kolom Kanan: Tanda Tangan Digital Opsional -->
+                <div class="md:col-span-5 bg-gray-50 border border-gray-200 rounded-xl p-3.5 flex flex-col justify-between space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-gray-700">
+                            <input type="checkbox" id="chk-cetak-ttd" checked onchange="simpanPreferensiCetak()" class="w-4 h-4 text-indigo-600 rounded">
+                            <span>Tampilkan TTD Digital</span>
+                        </label>
+                        <div class="flex items-center gap-1.5">
+                            <label class="text-[11px] bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-semibold px-2 py-1 rounded-lg cursor-pointer">
+                                <i class="fa-solid fa-upload mr-1"></i> PNG
+                                <input type="file" accept="image/*" onchange="uploadTTDKartu(event)" class="hidden">
+                            </label>
+                            <button type="button" onclick="hapusTTDKartu()" class="text-[11px] bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-semibold px-2 py-1 rounded-lg cursor-pointer">Hapus</button>
+                        </div>
+                    </div>
+
+                    <div id="preview-ttd-box" class="hidden bg-white border border-gray-200 rounded-lg p-1.5 text-center">
+                        <img id="img-preview-ttd" src="" alt="Preview TTD" class="h-14 mx-auto object-contain">
+                    </div>
+
+                    <canvas id="canvas-ttd-kartu" width="320" height="110" class="w-full h-28 bg-white border border-dashed border-gray-400 rounded-lg cursor-crosshair touch-none"></canvas>
+                    <p class="text-[10px] text-gray-500 leading-tight">Goreskan TTD di kotak putih atau unggah PNG. Hilangkan centang jika ingin tanda tangan manual.</p>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-3 border-t">
+                <button type="button" onclick="tutupModalCetak()" class="px-4 py-2 mr-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-semibold cursor-pointer">Batal</button>
+                <button type="button" onclick="prosesCetakKartu()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-sm cursor-pointer flex items-center gap-2">
+                    <i class="fa-solid fa-print"></i>
+                    <span>Cetak Sekarang</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL IMPORT EXCEL -->
+    <div id="modal-import" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-gray-800">Import Data Siswa</h3>
+                <button type="button" onclick="tutupModalImport()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+            </div>
+            <div>
+                <button type="button" onclick="downloadTemplateExcel()" class="mb-4 text-xs bg-blue-100 text-blue-700 font-bold py-2 px-3 rounded-lg hover:bg-blue-200">
+                    <i class="fa-solid fa-download"></i> Download Template Excel
+                </button>
+                <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Upload File Excel (.xlsx)</label>
+                <input type="file" id="file-excel-siswa" accept=".xlsx, .xls" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+            </div>
+            <div class="flex justify-end pt-3 border-t">
+                <button type="button" onclick="tutupModalImport()" class="px-4 py-2 mr-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-semibold">Batal</button>
+                <button type="button" onclick="prosesUploadExcel()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold">Upload & Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script>
+        const sessionData = localStorage.getItem('userLogin');
+        let currentUser = null;
+        let dataSiswaGlobal = [];
+
+        if (!sessionData) {
+            window.location.href = "login.html";
+        } else {
+            currentUser = JSON.parse(sessionData);
+            if (currentUser.role !== 'admin') { window.location.replace("dashboard_guru.html"); }
+            document.getElementById('admin-name').innerText = currentUser.nama_lengkap;
+            muatDataSiswa();
+        }
+
+        function bukaModalSiswa() {
+            document.getElementById('modal-title').innerText = 'Tambah Siswa Baru';
+            document.getElementById('form-siswa').reset();
+            document.getElementById('siswa-id').value = '';
+            document.getElementById('modal-siswa').classList.remove('hidden');
+        }
+        function tutupModalSiswa() { document.getElementById('modal-siswa').classList.add('hidden'); }
+        function bukaModalImport() { document.getElementById('modal-import').classList.remove('hidden'); }
+        function tutupModalImport() { document.getElementById('modal-import').classList.add('hidden'); }
+
+        // =====================================================================
+        // PENGATURAN & LOGIKA CETAK KARTU UJIAN (LOGO, TANGGAL & TTD OPSIONAL)
+        // =====================================================================
+        let logoKartuSrc = localStorage.getItem('cbt_kartu_logo') || 'logo-sekolah.png';
+        let ttdKartuDataUrl = localStorage.getItem('cbt_kartu_ttd') || '';
+
+        function getDefaultInfoCetak() {
+            const now = new Date();
+            const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const tanggalStr = `Tebing Tinggi, ${now.getDate()} ${namaBulan[now.getMonth()]} ${now.getFullYear()}`;
+            const tahun = now.getFullYear();
+            const isGanjil = (now.getMonth() + 1) >= 7;
+            const tahunAjaran = isGanjil ? `${tahun}/${tahun + 1}` : `${tahun - 1}/${tahun}`;
+            const asesmenStr = `PENILAIAN AKHIR SEMESTER (PAS) ${isGanjil ? 'GANJIL' : 'GENAP'} ${tahunAjaran}`;
+            return { tanggalStr, asesmenStr };
+        }
+
+        function bukaModalCetakKartu() { 
+            const kelasUnik = [...new Set(dataSiswaGlobal.map(item => item.kelas))].sort();
+            const selectKelas = document.getElementById('pilih-kelas-cetak');
+            selectKelas.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+            kelasUnik.forEach(kls => {
+                selectKelas.innerHTML += `<option value="${kls}">${kls}</option>`;
+            });
+
+            const { tanggalStr, asesmenStr } = getDefaultInfoCetak();
+            document.getElementById('cetak-asesmen').value = localStorage.getItem('cbt_kartu_asesmen') || asesmenStr;
+            document.getElementById('cetak-tanggal').value = tanggalStr;
+            document.getElementById('cetak-jabatan').value = localStorage.getItem('cbt_kartu_jabatan') || 'Proktor / Panitia Ujian,';
+            document.getElementById('cetak-nama-proktor').value = localStorage.getItem('cbt_kartu_nama') ?? (currentUser?.nama_lengkap || '');
+            document.getElementById('cetak-nip-proktor').value = localStorage.getItem('cbt_kartu_nip') || '';
+
+            const savedLogoCheck = localStorage.getItem('cbt_kartu_show_logo');
+            document.getElementById('chk-cetak-logo').checked = savedLogoCheck === null ? true : savedLogoCheck === 'true';
+
+            const savedTtdCheck = localStorage.getItem('cbt_kartu_show_ttd');
+            document.getElementById('chk-cetak-ttd').checked = savedTtdCheck === null ? true : savedTtdCheck === 'true';
+
+            perbaruiPreviewTTD();
+            document.getElementById('modal-cetak').classList.remove('hidden'); 
+        }
+
+        function tutupModalCetak() { document.getElementById('modal-cetak').classList.add('hidden'); }
+
+        function simpanPreferensiCetak() {
+            localStorage.setItem('cbt_kartu_asesmen', document.getElementById('cetak-asesmen').value);
+            localStorage.setItem('cbt_kartu_jabatan', document.getElementById('cetak-jabatan').value);
+            localStorage.setItem('cbt_kartu_nama', document.getElementById('cetak-nama-proktor').value);
+            localStorage.setItem('cbt_kartu_nip', document.getElementById('cetak-nip-proktor').value);
+            localStorage.setItem('cbt_kartu_show_logo', document.getElementById('chk-cetak-logo').checked);
+            localStorage.setItem('cbt_kartu_show_ttd', document.getElementById('chk-cetak-ttd').checked);
+        }
+
+        function uploadLogoKartu(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                logoKartuSrc = e.target.result;
+                localStorage.setItem('cbt_kartu_logo', logoKartuSrc);
+                document.getElementById('chk-cetak-logo').checked = true;
+                simpanPreferensiCetak();
+                alert('Logo sekolah untuk kartu ujian berhasil diperbarui!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetLogoKartu() {
+            logoKartuSrc = 'logo-sekolah.png';
+            localStorage.removeItem('cbt_kartu_logo');
+            document.getElementById('chk-cetak-logo').checked = true;
+            simpanPreferensiCetak();
+            alert('Logo dikembalikan ke default (logo-sekolah.png).');
+        }
+
+        function perbaruiPreviewTTD() {
+            const box = document.getElementById('preview-ttd-box');
+            const img = document.getElementById('img-preview-ttd');
+            if (ttdKartuDataUrl) {
+                img.src = ttdKartuDataUrl;
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        // Kanvas Tanda Tangan Digital
+        const canvasTTD = document.getElementById('canvas-ttd-kartu');
+        const ctxTTD = canvasTTD.getContext('2d');
+        ctxTTD.lineWidth = 2.2;
+        ctxTTD.lineCap = 'round';
+        ctxTTD.strokeStyle = '#0f172a';
+        let sedangMenggambarTTD = false;
+
+        function getPosisiTTD(e) {
+            const rect = canvasTTD.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * (canvasTTD.width / rect.width),
+                y: (clientY - rect.top) * (canvasTTD.height / rect.height)
+            };
+        }
+
+        canvasTTD.addEventListener('mousedown', (e) => {
+            sedangMenggambarTTD = true;
+            const p = getPosisiTTD(e);
+            ctxTTD.beginPath();
+            ctxTTD.moveTo(p.x, p.y);
+        });
+        canvasTTD.addEventListener('mousemove', (e) => {
+            if (!sedangMenggambarTTD) return;
+            const p = getPosisiTTD(e);
+            ctxTTD.lineTo(p.x, p.y);
+            ctxTTD.stroke();
+        });
+        window.addEventListener('mouseup', () => {
+            if (sedangMenggambarTTD) {
+                sedangMenggambarTTD = false;
+                ttdKartuDataUrl = canvasTTD.toDataURL('image/png');
+                localStorage.setItem('cbt_kartu_ttd', ttdKartuDataUrl);
+                document.getElementById('chk-cetak-ttd').checked = true;
+                simpanPreferensiCetak();
+                perbaruiPreviewTTD();
+            }
+        });
+
+        canvasTTD.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            sedangMenggambarTTD = true;
+            const p = getPosisiTTD(e);
+            ctxTTD.beginPath();
+            ctxTTD.moveTo(p.x, p.y);
+        });
+        canvasTTD.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!sedangMenggambarTTD) return;
+            const p = getPosisiTTD(e);
+            ctxTTD.lineTo(p.x, p.y);
+            ctxTTD.stroke();
+        });
+        canvasTTD.addEventListener('touchend', () => {
+            if (sedangMenggambarTTD) {
+                sedangMenggambarTTD = false;
+                ttdKartuDataUrl = canvasTTD.toDataURL('image/png');
+                localStorage.setItem('cbt_kartu_ttd', ttdKartuDataUrl);
+                document.getElementById('chk-cetak-ttd').checked = true;
+                simpanPreferensiCetak();
+                perbaruiPreviewTTD();
+            }
+        });
+
+        function uploadTTDKartu(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                ttdKartuDataUrl = e.target.result;
+                localStorage.setItem('cbt_kartu_ttd', ttdKartuDataUrl);
+                ctxTTD.clearRect(0, 0, canvasTTD.width, canvasTTD.height);
+                document.getElementById('chk-cetak-ttd').checked = true;
+                simpanPreferensiCetak();
+                perbaruiPreviewTTD();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function hapusTTDKartu() {
+            ttdKartuDataUrl = '';
+            localStorage.removeItem('cbt_kartu_ttd');
+            ctxTTD.clearRect(0, 0, canvasTTD.width, canvasTTD.height);
+            perbaruiPreviewTTD();
+        }
+
+        function prosesCetakKartu() {
+            const kelasDipilih = document.getElementById('pilih-kelas-cetak').value;
+            if (!kelasDipilih) { alert("Pilih kelas terlebih dahulu!"); return; }
+
+            const dataCetak = dataSiswaGlobal.filter(s => s.kelas === kelasDipilih);
+            if (dataCetak.length === 0) { alert("Tidak ada siswa di kelas ini."); return; }
+
+            simpanPreferensiCetak();
+
+            const asesmen = document.getElementById('cetak-asesmen').value.trim() || 'UJIAN BERBASIS KOMPUTER';
+            const tanggal = document.getElementById('cetak-tanggal').value.trim() || getDefaultInfoCetak().tanggalStr;
+            const jabatan = document.getElementById('cetak-jabatan').value.trim() || 'Proktor / Panitia Ujian,';
+            const namaProktor = document.getElementById('cetak-nama-proktor').value.trim();
+            const nipProktor = document.getElementById('cetak-nip-proktor').value.trim();
+            const tampilLogo = document.getElementById('chk-cetak-logo').checked;
+            const tampilTTD = document.getElementById('chk-cetak-ttd').checked;
+
+            const blokKop = tampilLogo ? `
+                <div class="flex items-center gap-2.5 border-b-2 border-slate-900 pb-2 mb-2.5">
+                    <img src="${logoKartuSrc}" alt="Logo" class="w-11 h-11 object-contain shrink-0" onerror="this.style.display='none'">
+                    <div class="flex-1 text-center leading-tight">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-600">KARTU PESERTA UJIAN CBT</p>
+                        <h4 class="text-xs font-extrabold uppercase text-slate-900 mt-0.5">SMAN 1 TEBING TINGGI</h4>
+                        <p class="text-[10px] font-bold uppercase text-blue-800 mt-0.5">${asesmen}</p>
+                    </div>
+                    <div class="w-7 shrink-0"></div>
+                </div>
+            ` : `
+                <div class="text-center border-b-2 border-slate-900 pb-2 mb-2.5 leading-tight">
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-600">KARTU PESERTA UJIAN CBT</p>
+                    <h4 class="text-xs font-extrabold uppercase text-slate-900 mt-0.5">SMAN 1 TEBING TINGGI</h4>
+                    <p class="text-[10px] font-bold uppercase text-blue-800 mt-0.5">${asesmen}</p>
+                </div>
+            `;
+
+            const blokTTD = (tampilTTD && ttdKartuDataUrl)
+                ? `<img src="${ttdKartuDataUrl}" alt="TTD" class="h-10 mx-auto object-contain -my-0.5">`
+                : `<div class="h-9"></div>`;
+
+            const blokNamaProktor = namaProktor
+                ? `<p class="font-bold underline text-slate-900 leading-tight">${namaProktor}</p>${nipProktor ? `<p class="text-[10px] text-slate-700 mt-0.5">NIP. ${nipProktor}</p>` : ''}`
+                : `<p class="font-bold">(...........................................)</p>`;
+
+            const gridArea = document.getElementById('print-grid');
+            gridArea.innerHTML = dataCetak.map(s => `
+                <div class="cetak-kartu bg-white px-4 py-3.5 flex flex-col justify-between">
+                    ${blokKop}
+
+                    <table class="w-full text-xs text-slate-900 mb-1.5">
+                        <tbody>
+                            <tr>
+                                <td class="py-0.5 font-semibold w-28">Nama Lengkap</td>
+                                <td class="py-0.5 font-bold w-3">:</td>
+                                <td class="py-0.5 font-bold uppercase">${s.nama_lengkap}</td>
+                            </tr>
+                            <tr>
+                                <td class="py-0.5 font-semibold">NISN / User</td>
+                                <td class="py-0.5 font-bold">:</td>
+                                <td class="py-0.5 font-mono font-bold">${s.nisn}</td>
+                            </tr>
+                            <tr>
+                                <td class="py-0.5 font-semibold">Kelas</td>
+                                <td class="py-0.5 font-bold">:</td>
+                                <td class="py-0.5 font-bold">${s.kelas}</td>
+                            </tr>
+                            <tr>
+                                <td class="py-0.5 font-semibold">Password</td>
+                                <td class="py-0.5 font-bold">:</td>
+                                <td class="py-0.5 font-mono font-bold">${s.password}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="flex justify-end text-[11px] text-slate-800 pt-1">
+                        <div class="text-center min-w-[185px]">
+                            <p>${tanggal}</p>
+                            <p class="font-semibold">${jabatan}</p>
+                            ${blokTTD}
+                            ${blokNamaProktor}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            tutupModalCetak();
+            
+            setTimeout(() => {
+                window.print();
+            }, 400);
+        }
+
+        // =====================================================================
+        // CRUD DATA SISWA & IMPORT EXCEL
+        // =====================================================================
+        async function muatDataSiswa() {
+            const tbody = document.getElementById('tabel-siswa-body');
+            const filterKelas = document.getElementById('filter-kelas').value;
+            tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-gray-400 italic">Memuat data...</td></tr>`;
+
+            const { data, error } = await db.from('siswa').select('*').order('kelas', { ascending: true }).order('nama_lengkap', { ascending: true });
+            
+            if (error) { console.error(error); tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500">Gagal memuat data</td></tr>`; return; }
+            
+            dataSiswaGlobal = data || [];
+            let dataTampil = filterKelas === 'ALL' ? dataSiswaGlobal : dataSiswaGlobal.filter(s => s.kelas.startsWith(filterKelas));
+
+            document.getElementById('counter-siswa').innerText = `${dataTampil.length} Siswa`;
+            
+            if (dataTampil.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-gray-400 italic">Belum ada data siswa.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = "";
+            dataTampil.forEach((s) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 font-mono font-bold text-gray-700">${s.nisn}</td>
+                        <td class="px-6 py-4 font-semibold text-gray-800">${s.nama_lengkap}</td>
+                        <td class="px-6 py-4"><span class="bg-indigo-100 text-indigo-800 px-2.5 py-1 rounded text-xs font-bold">${s.kelas}</span></td>
+                        <td class="px-6 py-4 font-mono text-xs text-gray-500">${s.password}</td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick='editSiswa(${JSON.stringify(s)})' class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
+                            <button onclick="hapusSiswa('${s.id}')" class="w-8 h-8 rounded-full bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors ml-1"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function simpanSiswa(e) {
+            e.preventDefault();
+            const id = document.getElementById('siswa-id').value;
+            const payload = {
+                nisn: document.getElementById('siswa-nisn').value.trim(),
+                nama_lengkap: document.getElementById('siswa-nama').value.trim(),
+                kelas: document.getElementById('siswa-kelas').value.trim(),
+                password: document.getElementById('siswa-pass').value.trim()
+            };
+
+            const { error } = id ? await db.from('siswa').update(payload).eq('id', id) : await db.from('siswa').insert([payload]);
+            if (error) { alert("Gagal menyimpan data."); console.error(error); }
+            else { alert("Data siswa tersimpan!"); tutupModalSiswa(); muatDataSiswa(); }
+        }
+
+        function editSiswa(s) {
+            document.getElementById('modal-title').innerText = 'Edit Siswa';
+            document.getElementById('siswa-id').value = s.id;
+            document.getElementById('siswa-nisn').value = s.nisn;
+            document.getElementById('siswa-nama').value = s.nama_lengkap;
+            document.getElementById('siswa-kelas').value = s.kelas;
+            document.getElementById('siswa-pass').value = s.password;
+            document.getElementById('modal-siswa').classList.remove('hidden');
+        }
+
+        async function hapusSiswa(id) {
+            if (confirm("Hapus siswa ini dari database?")) {
+                await db.from('siswa').delete().eq('id', id);
+                muatDataSiswa();
+            }
+        }
+
+        function downloadTemplateExcel() {
+            const data = [{ NISN: "0012345678", Nama_Lengkap: "Budi Santoso", Kelas: "X A", Password: "PASS" }];
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Data Siswa");
+            XLSX.writeFile(wb, "Template_Siswa_CBT.xlsx");
+        }
+
+        function prosesUploadExcel() {
+            const fileInput = document.getElementById('file-excel-siswa');
+            if (fileInput.files.length === 0) return alert("Pilih file!");
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                const jsonRows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                const dataBaru = jsonRows.map(row => ({
+                    nisn: String(row.NISN || ''),
+                    nama_lengkap: String(row.Nama_Lengkap || ''),
+                    kelas: String(row.Kelas || ''),
+                    password: String(row.Password || '')
+                })).filter(s => s.nisn && s.nama_lengkap);
+
+                if (dataBaru.length > 0) {
+                    const { error } = await db.from('siswa').insert(dataBaru);
+                    if (!error) { alert(`Berhasil mengimpor ${dataBaru.length} siswa!`); tutupModalImport(); muatDataSiswa(); }
+                }
+            };
+            reader.readAsArrayBuffer(fileInput.files[0]);
+        }
+
+        function logoutAdmin() { localStorage.removeItem('userLogin'); window.location.href = "login.html"; }
+    </script>
+</body>
+</html>

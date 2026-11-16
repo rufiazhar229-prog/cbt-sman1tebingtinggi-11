@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard CBT - SMAN 1 Tebing Tinggi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style> 
+        body { font-family: 'Inter', sans-serif; } 
+        /* Transisi halus untuk Sidebar */
+        .sidebar-transition { transition: all 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Kontainer Utama -->
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- SIDEBAR (Navigasi Kiri) -->
+        <aside id="sidebar" class="w-64 bg-slate-800 text-white flex flex-col justify-between shrink-0 z-20 shadow-xl sidebar-transition overflow-hidden">
+            <div>
+                <!-- Header Sidebar -->
+                <div class="h-16 flex items-center justify-center border-b border-slate-700 bg-slate-900 whitespace-nowrap">
+                    <i class="fa-solid fa-graduation-cap text-2xl text-teal-400"></i>
+                    <h1 id="sidebar-logo-text" class="text-lg font-bold tracking-wider ml-2 sidebar-text">CBT SMAN 1 TT</h1>
+                </div>
+                
+                <!-- Navigasi Menu -->
+                <nav class="py-4 space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)] custom-scrollbar">
+                    
+                    <!-- KATEGORI 1: MENU UTAMA -->
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-2 truncate">Menu Utama</p>
+                    
+                    <a href="dashboard.html" class="w-full flex items-center px-6 py-3 bg-blue-600 text-white shadow-md text-left font-semibold">
+                        <i class="fa-solid fa-gauge-high w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Dashboard</span>
+                    </a>
+                    <a href="paket_soal.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Paket & Bank Soal">
+                        <i class="fa-solid fa-folder-open w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Paket & Bank Soal</span>
+                    </a>
+                    <a href="sesi.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Sesi Ujian & Token">
+                        <i class="fa-solid fa-clock w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Sesi Ujian & Token</span>
+                    </a>
+
+                    <!-- KATEGORI 2: PELAKSANAAN & EVALUASI -->
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-amber-400 uppercase tracking-wider mt-6 mb-2 truncate">Pelaksanaan & Evaluasi</p>
+                    
+                    <a href="monitor.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Monitoring Live">
+                        <i class="fa-solid fa-desktop w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Monitoring Live</span>
+                    </a>
+                    <a href="penilaian.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Penilaian & Hasil">
+                        <i class="fa-solid fa-square-poll-vertical w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Penilaian & Hasil</span>
+                    </a>
+
+                    <!-- KATEGORI 3: AREA ADMIN -->
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-emerald-400 uppercase tracking-wider mt-6 mb-2 truncate">Area Admin</p>
+                    
+                    <a href="siswa.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Data Siswa & Kelas">
+                        <i class="fa-solid fa-users w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Data Siswa & Kelas</span>
+                    </a>
+                    <a href="guru.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Data Guru & Mapel">
+                        <i class="fa-solid fa-chalkboard-user w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Data Guru & Mapel</span>
+                    </a>
+                    <a href="pengaturan.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Pengaturan Sistem">
+                        <i class="fa-solid fa-gears w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Pengaturan Sistem</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Tombol Keluar -->
+            <div class="p-4 border-t border-slate-700 bg-slate-900 shrink-0">
+                <button type="button" onclick="logoutAdmin()" class="w-full flex items-center justify-center p-2.5 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold transition-colors shadow-sm cursor-pointer" title="Keluar">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span class="sidebar-text ml-2 whitespace-nowrap">Keluar</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- AREA KONTEN UTAMA -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-gray-50">
+            
+            <!-- Header Atas -->
+            <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0">
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleSidebar()" class="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    <div class="h-6 w-px bg-gray-300"></div>
+                    <h2 class="text-lg md:text-xl font-bold text-gray-800">Pusat Komando CBT</h2>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="text-right hidden sm:block">
+                        <p id="admin-name" class="text-sm font-bold text-gray-800">Memuat...</p>
+                        <p class="text-[10px] text-blue-600 font-bold uppercase tracking-wider">SMAN 1 Tebing Tinggi</p>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-br from-slate-700 to-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-md">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Isi Konten Dashboard -->
+            <div class="flex-1 overflow-y-auto p-6 md:p-8 space-y-8">
+                
+                <!-- Banner Selamat Datang -->
+                <div class="bg-gradient-to-r from-blue-700 to-indigo-800 rounded-2xl p-8 text-white shadow-lg flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+                    <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
+                        <i class="fa-solid fa-globe text-[150px] -mt-10 -mr-10"></i>
+                    </div>
+                    
+                    <div class="space-y-2 mb-6 md:mb-0 relative z-10">
+                        <h3 class="text-2xl md:text-3xl font-extrabold">Selamat Datang, <span id="welcome-name">Guru</span>!</h3>
+                        <p class="text-blue-100 text-sm max-w-xl">Pusat kendali ujian berbasis komputer (CBT) Kurikulum Merdeka. Kelola paket soal, jadwalkan ujian, dan pantau siswa secara real-time dari satu tempat.</p>
+                    </div>
+                    <div class="relative z-10 w-full md:w-auto text-center">
+                        <span class="inline-block bg-blue-900/50 border border-blue-500/30 text-blue-100 text-xs px-4 py-2 rounded-full font-mono">
+                            <i class="fa-solid fa-calendar-day mr-1"></i> <span id="tanggal-hari-ini">Memuat Tanggal...</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 1. KARTU STATISTIK (Quick Stats) -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-users"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Siswa</p>
+                            <h3 id="stat-siswa" class="text-2xl font-black text-gray-800">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-folder-open"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Paket Soal</p>
+                            <h3 id="stat-soal" class="text-2xl font-black text-gray-800">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-satellite-dish"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Sesi Aktif</p>
+                            <h3 id="stat-sesi" class="text-2xl font-black text-gray-800">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-pen-clip"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Tugas Esai</p>
+                            <h3 id="stat-esai" class="text-2xl font-black text-gray-800">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. PUSAT JALAN PINTAS (Quick Access Hub) -->
+                <div>
+                    <h4 class="text-sm font-bold text-gray-600 uppercase tracking-wider mb-4 border-b pb-2">Akses Cepat Menu Utama</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        <a href="paket_soal.html" class="group bg-white p-4 rounded-xl shadow-sm border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all text-center flex flex-col items-center justify-center h-32">
+                            <i class="fa-solid fa-folder-plus text-3xl text-gray-400 group-hover:text-blue-500 mb-3 transition-colors"></i>
+                            <span class="text-sm font-bold text-gray-700 group-hover:text-blue-600">Buat Paket Soal</span>
+                        </a>
+                        <a href="sesi.html" class="group bg-white p-4 rounded-xl shadow-sm border border-gray-200 hover:border-indigo-400 hover:shadow-md transition-all text-center flex flex-col items-center justify-center h-32">
+                            <i class="fa-solid fa-clock text-3xl text-gray-400 group-hover:text-indigo-500 mb-3 transition-colors"></i>
+                            <span class="text-sm font-bold text-gray-700 group-hover:text-indigo-600">Jadwalkan Ujian</span>
+                        </a>
+                        <a href="siswa.html" class="group bg-white p-4 rounded-xl shadow-sm border border-gray-200 hover:border-emerald-400 hover:shadow-md transition-all text-center flex flex-col items-center justify-center h-32">
+                            <i class="fa-solid fa-id-card text-3xl text-gray-400 group-hover:text-emerald-500 mb-3 transition-colors"></i>
+                            <span class="text-sm font-bold text-gray-700 group-hover:text-emerald-600">Cetak Kartu Ujian</span>
+                        </a>
+                        <a href="monitor.html" class="group bg-white p-4 rounded-xl shadow-sm border border-gray-200 hover:border-red-400 hover:shadow-md transition-all text-center flex flex-col items-center justify-center h-32">
+                            <i class="fa-solid fa-tower-broadcast text-3xl text-gray-400 group-hover:text-red-500 mb-3 transition-colors"></i>
+                            <span class="text-sm font-bold text-gray-700 group-hover:text-red-600">Pantau Live</span>
+                        </a>
+                        <a href="penilaian.html" class="group bg-white p-4 rounded-xl shadow-sm border border-gray-200 hover:border-amber-400 hover:shadow-md transition-all text-center flex flex-col items-center justify-center h-32">
+                            <i class="fa-solid fa-spell-check text-3xl text-gray-400 group-hover:text-amber-500 mb-3 transition-colors"></i>
+                            <span class="text-sm font-bold text-gray-700 group-hover:text-amber-600">Koreksi Nilai</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 3. PAPAN STATUS LIVE (Sesi Ujian Hari Ini) -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                        <h4 class="font-bold text-gray-800"><i class="fa-solid fa-calendar-check text-indigo-500 mr-2"></i> Jadwal Ujian Terbaru / Aktif (WITA)</h4>
+                        <a href="sesi.html" class="text-xs font-bold text-blue-600 hover:underline">Kelola Sesi</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-xs text-gray-500 uppercase tracking-wider bg-white border-b border-gray-100">
+                                    <th class="px-6 py-3 font-semibold">Nama Sesi & Paket</th>
+                                    <th class="px-6 py-3 font-semibold text-center">Jadwal Waktu</th>
+                                    <th class="px-6 py-3 font-semibold text-center">Status</th>
+                                    <th class="px-6 py-3 font-semibold text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabel-jadwal-hari-ini" class="text-sm divide-y divide-gray-50">
+                                <tr><td colspan="4" class="py-6 text-center text-gray-400 italic">Memuat jadwal ujian...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Script JavaScript Supabase & Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script>
+        // Fungsi Memuat Angka Statistik dari Database Supabase
+        async function muatStatistikDashboard() {
+            try {
+                // 1. Hitung Total Siswa
+                const { count: totalSiswa } = await db.from('siswa').select('*', { count: 'exact', head: true });
+                document.getElementById('stat-siswa').innerText = totalSiswa || 0;
+
+                // 2. Hitung Total Paket Soal / Bank Soal
+                const { count: totalSoal } = await db.from('bank_soal').select('*', { count: 'exact', head: true });
+                document.getElementById('stat-soal').innerText = totalSoal || 0;
+
+                // 3. Hitung Sesi Ujian Aktif (Status 'aktif')
+                const { count: totalSesi } = await db.from('sesi_ujian').select('*', { count: 'exact', head: true }).eq('status', 'aktif');
+                document.getElementById('stat-sesi').innerText = totalSesi || 0;
+
+                // 4. Hitung Total Jawaban / Tugas Esai Masuk
+                const { count: totalEsai } = await db.from('jawaban_siswa').select('*', { count: 'exact', head: true });
+                document.getElementById('stat-esai').innerText = totalEsai || 0;
+
+            } catch (err) {
+                console.error("Gagal memuat statistik:", err);
+            }
+        }
+        
+        // Set Tanggal Hari Ini
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('tanggal-hari-ini').innerText = new Date().toLocaleDateString('id-ID', options);
+
+        // Pengaman Sesi Login
+        const sessionData = localStorage.getItem('userLogin');
+        if (!sessionData) {
+            alert("Akses ditolak! Silakan login terlebih dahulu.");
+            window.location.href = "login.html";
+        } else {
+            const user = JSON.parse(sessionData);
+            if (user.role !== 'admin') { window.location.replace("dashboard_guru.html"); }
+            document.getElementById('admin-name').innerText = user.nama_lengkap;
+            document.getElementById('welcome-name').innerText = user.nama_lengkap.split(' ')[0]; 
+            
+            // Panggil fungsi statistik agar angka langsung tampil dari database
+            muatStatistikDashboard();
+            muatJadwalHariIni(); 
+        }
+
+        // Fungsi Logout
+        function logoutAdmin() {
+            if (confirm("Apakah Bapak/Ibu yakin ingin keluar dari sistem CBT?")) {
+                localStorage.removeItem('userLogin');
+                window.location.href = "login.html";
+            }
+        }
+
+        // FUNGSI MINIMIZE SIDEBAR (LIPAT MENU)
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const allTexts = document.querySelectorAll('.sidebar-text');
+            const kategoriTitles = document.querySelectorAll('.sidebar-kategori');
+
+            if (sidebar.classList.contains('w-64')) {
+                sidebar.classList.remove('w-64');
+                sidebar.classList.add('w-20');
+                
+                allTexts.forEach(el => el.classList.add('hidden'));
+                
+                kategoriTitles.forEach(el => {
+                    el.classList.remove('text-[10px]');
+                    el.classList.add('text-[0px]', 'text-center');
+                    el.innerHTML = '•••'; 
+                });
+            } else {
+                sidebar.classList.remove('w-20');
+                sidebar.classList.add('w-64');
+                
+                setTimeout(() => {
+                    allTexts.forEach(el => el.classList.remove('hidden'));
+                }, 150);
+                
+                kategoriTitles[0].innerHTML = 'Menu Utama';
+                kategoriTitles[1].innerHTML = 'Pelaksanaan & Evaluasi';
+                kategoriTitles[2].innerHTML = 'Area Admin';
+                
+                kategoriTitles.forEach(el => {
+                    el.classList.remove('text-[0px]', 'text-center');
+                    el.classList.add('text-[10px]');
+                });
+            }
+        }
+
+        // Fungsi helper untuk mendapatkan waktu WITA (GMT+8) yang presisi
+        function getWaktuWITA() {
+            const sekarang = new Date();
+            const utc = sekarang.getTime() + (sekarang.getTimezoneOffset() * 60000);
+            return new Date(utc + (3600000 * 8)); // WITA = UTC + 8
+        }
+
+        // Fungsi parser jam WITA untuk mengatasi format UTC/ISO dari database
+        function parseJamWITA(strWaktu) {
+            if (!strWaktu) return { jamStr: "00:00", totalMenit: 0 };
+            let jamStr = strWaktu;
+            if (strWaktu.includes('T') || strWaktu.includes('Z')) {
+                const dateObj = new Date(strWaktu);
+                const utc = dateObj.getTime() + (dateObj.getTimezoneOffset() * 60000);
+                const witaDate = new Date(utc + (3600000 * 8));
+                const h = String(witaDate.getHours()).padStart(2, '0');
+                const m = String(witaDate.getMinutes()).padStart(2, '0');
+                jamStr = `${h}:${m}`;
+            } else if (strWaktu.length >= 5) {
+                jamStr = strWaktu.substring(0, 5);
+            }
+            const parts = jamStr.split(':');
+            const totalMenit = (parseInt(parts[0]) * 60) + parseInt(parts[1] || 0);
+            return { jamStr, totalMenit };
+        }
+
+        // Fungsi untuk mengambil jadwal sesi ujian & mencocokkan waktunya secara otomatis
+        async function muatJadwalHariIni() {
+            const tbody = document.getElementById('tabel-jadwal-hari-ini');
+            try {
+                const { data: sesiList, error } = await db
+                    .from('sesi_ujian')
+                    .select('*')
+                    .limit(5);
+
+                if (error) throw error;
+
+                if (!sesiList || sesiList.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-gray-400 italic">Tidak ada jadwal sesi ujian saat ini.</td></tr>`;
+                    return;
+                }
+
+                // Dapatkan jam WITA saat ini
+                const witaSekarang = getWaktuWITA();
+                const jamMenitSekarang = (witaSekarang.getHours() * 60) + witaSekarang.getMinutes();
+
+                tbody.innerHTML = "";
+                sesiList.forEach(sesi => {
+                    const namaSesi = sesi.nama_sesi || sesi.nama_ujian || sesi.judul || 'Ujian CBT';
+                    const tokenSesi = sesi.token || sesi.kode_token || '-';
+
+                    // Gunakan parser WITA yang akurat untuk jam mulai dan selesai
+                    const mulaiInfo = parseJamWITA(sesi.waktu_mulai || sesi.jam_mulai);
+                    const selesaiInfo = parseJamWITA(sesi.waktu_selesai || sesi.jam_selesai);
+
+                    let badgeStatus = '';
+                    let tombolAksi = '';
+                    const statusDB = String(sesi.status || '').toLowerCase();
+
+                    if (statusDB === 'selesai' || statusDB === 'ditutup' || jamMenitSekarang > selesaiInfo.totalMenit) {
+                        badgeStatus = `
+                            <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide">
+                                Selesai / Ditutup
+                            </span>
+                        `;
+                        tombolAksi = `<button class="inline-block bg-gray-100 text-gray-400 px-4 py-1.5 rounded-lg text-xs font-bold cursor-not-allowed" disabled>Selesai</button>`;
+                    } else if (jamMenitSekarang >= mulaiInfo.totalMenit && jamMenitSekarang <= selesaiInfo.totalMenit) {
+                        badgeStatus = `
+                            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide inline-flex items-center">
+                                <span class="w-2 h-2 rounded-full bg-green-500 mr-1.5 animate-pulse"></span> Sedang Berjalan
+                            </span>
+                        `;
+                        tombolAksi = `<a href="monitor.html" class="inline-block bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-colors">Pantau</a>`;
+                    } else {
+                        badgeStatus = `
+                            <span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide">
+                                Belum Mulai
+                            </span>
+                        `;
+                        tombolAksi = `<button class="inline-block bg-gray-100 text-gray-400 px-4 py-1.5 rounded-lg text-xs font-bold cursor-not-allowed" disabled>Menunggu</button>`;
+                    }
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <p class="font-bold text-gray-800">${namaSesi}</p>
+                                <p class="text-xs text-gray-500">Token: <span class="font-mono font-bold text-blue-600">${tokenSesi}</span></p>
+                            </td>
+                            <td class="px-6 py-4 text-center font-mono text-gray-600">${mulaiInfo.jamStr} - ${selesaiInfo.jamStr} WITA</td>
+                            <td class="px-6 py-4 text-center">${badgeStatus}</td>
+                            <td class="px-6 py-4 text-right">${tombolAksi}</td>
+                        </tr>
+                    `;
+                });
+
+            } catch (err) {
+                console.error("Gagal memuat jadwal:", err);
+                tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-red-400 italic">Gagal memuat data jadwal.</td></tr>`;
+            }
+        }
+    </script>
+</body>
+</html>

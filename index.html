@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal CBT | SMAN 1 Tebing Tinggi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #0f172a;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.18) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.14) 0px, transparent 50%);
+    }
+    .glass-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col justify-between antialiased selection:bg-blue-500 selection:text-white">
+
+  <!-- Header / Navbar -->
+  <header class="w-full border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+          <i class="fa-solid fa-laptop-code text-white text-lg"></i>
+        </div>
+        <div>
+          <span class="font-bold text-lg tracking-tight text-white block leading-none">CBT SMANTEB</span>
+          <span class="text-xs text-slate-400 font-medium">SMAN 1 Tebing Tinggi</span>
+        </div>
+      </div>
+
+      <!-- Widget Jam Real-time -->
+      <div class="flex items-center gap-2.5 bg-slate-800/80 border border-slate-700/60 px-4 py-2 rounded-full text-xs font-medium text-slate-300">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="live-date">Memuat tanggal...</span>
+        <span class="text-slate-600">|</span>
+        <span id="live-clock" class="font-bold text-white tracking-wider">00:00:00</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-4xl mx-auto px-6 py-12 w-full my-auto">
+    <div class="text-center max-w-2xl mx-auto mb-12">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold mb-4">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Computer-Based Test System</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-3">
+        Portal Ujian Berbasis Komputer
+      </h1>
+      <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+        Selamat datang di sistem evaluasi digital <strong class="text-slate-200">SMAN 1 Tebing Tinggi</strong>. Silakan pilih pintu masuk sesuai hak akses Anda.
+      </p>
+    </div>
+
+    <!-- Grid Pilihan Akses -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Kartu Login Siswa -->
+      <a href="login_siswa.html" class="group glass-card rounded-2xl p-7 transition-all duration-300 hover:-translate-y-1.5 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <div class="w-14 h-14 rounded-2xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+              <i class="fa-solid fa-user-graduate text-2xl"></i>
+            </div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full">
+              Peserta Ujian
+            </span>
+          </div>
+          <h2 class="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">
+            Login Siswa
+          </h2>
+          <p class="text-slate-400 text-sm leading-relaxed mb-8">
+            Masuk menggunakan akun peserta untuk mengerjakan soal ujian, memasukkan token sesi, dan melihat status pengerjaan.
+          </p>
+        </div>
+        <div class="flex items-center justify-between pt-4 border-t border-slate-700/60 text-sm font-semibold text-blue-400 group-hover:text-blue-300">
+          <span>Masuk Ruang Ujian</span>
+          <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1.5 transition-transform"></i>
+        </div>
+      </a>
+
+      <!-- Kartu Login Guru / Admin / Pengawas -->
+      <a href="login.html" class="group glass-card rounded-2xl p-7 transition-all duration-300 hover:-translate-y-1.5 hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-300">
+              <i class="fa-solid fa-chalkboard-user text-2xl"></i>
+            </div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full">
+              Manajemen & Kontrol
+            </span>
+          </div>
+          <h2 class="text-xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">
+            Login Guru, Pengawas & Admin
+          </h2>
+          <p class="text-slate-400 text-sm leading-relaxed mb-8">
+            Akses panel manajemen bank soal, pengaturan jadwal sesi, rilis token ujian, pemantauan peserta, dan rekapitulasi nilai.
+          </p>
+        </div>
+        <div class="flex items-center justify-between pt-4 border-t border-slate-700/60 text-sm font-semibold text-emerald-400 group-hover:text-emerald-300">
+          <span>Masuk Panel Pengelola</span>
+          <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1.5 transition-transform"></i>
+        </div>
+      </a>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full border-t border-slate-800/80 py-5 text-center text-xs text-slate-500">
+    <p>&copy; <span id="year"></span> CBT SMAN 1 Tebing Tinggi &bull; Kabupaten Balangan</p>
+  </footer>
+
+  <!-- Script Jam Digital -->
+  <script>
+    function updateDateTime() {
+      const now = new Date();
+      const dateOptions = { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' };
+      document.getElementById('live-date').textContent = now.toLocaleDateString('id-ID', dateOptions);
+      document.getElementById('live-clock').textContent = now.toLocaleTimeString('id-ID', { hour12: false });
+    }
+    document.getElementById('year').textContent = new Date().getFullYear();
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+  </script>
+</body>
+</html>

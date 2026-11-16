@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan Sistem - CBT SMAN 1 Tebing Tinggi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style> 
+        body { font-family: 'Inter', sans-serif; } 
+        .sidebar-transition { transition: all 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="w-64 bg-slate-800 text-white flex flex-col justify-between shrink-0 z-20 shadow-xl sidebar-transition overflow-hidden">
+            <div>
+                <div class="h-16 flex items-center justify-center border-b border-slate-700 bg-slate-900 whitespace-nowrap">
+                    <i class="fa-solid fa-graduation-cap text-2xl text-teal-400"></i>
+                    <h1 class="text-lg font-bold tracking-wider ml-2 sidebar-text">CBT SMAN 1 TT</h1>
+                </div>
+                <nav class="py-4 space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)]">
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-2 truncate">Menu Utama</p>
+                    <a href="dashboard.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 text-slate-300 hover:text-white"><i class="fa-solid fa-gauge-high w-6 text-center"></i><span class="sidebar-text ml-2">Dashboard</span></a>
+                    <a href="paket_soal.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 text-slate-300 hover:text-white"><i class="fa-solid fa-folder-open w-6 text-center"></i><span class="sidebar-text ml-2">Paket & Bank Soal</span></a>
+                    <a href="sesi.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 text-slate-300 hover:text-white"><i class="fa-solid fa-clock w-6 text-center"></i><span class="sidebar-text ml-2">Sesi Ujian & Token</span></a>
+                    
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-amber-400 uppercase tracking-wider mt-6 mb-2 truncate">Pelaksanaan & Evaluasi</p>
+                    <a href="monitor.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 text-slate-300 hover:text-white"><i class="fa-solid fa-desktop w-6 text-center"></i><span class="sidebar-text ml-2">Monitoring Live</span></a>
+                    <a href="penilaian.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 text-slate-300 hover:text-white"><i class="fa-solid fa-square-poll-vertical w-6 text-center"></i><span class="sidebar-text ml-2">Penilaian & Hasil</span></a>
+
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-emerald-400 uppercase tracking-wider mt-6 mb-2 truncate">Area Admin</p>
+                    <a href="siswa.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 text-slate-300 hover:text-white"><i class="fa-solid fa-users w-6 text-center"></i><span class="sidebar-text ml-2">Data Siswa & Kelas</span></a>
+                    <a href="guru.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 text-slate-300 hover:text-white"><i class="fa-solid fa-chalkboard-user w-6 text-center"></i><span class="sidebar-text ml-2">Data Guru & Mapel</span></a>
+                    <a href="pengaturan.html" class="w-full flex items-center px-6 py-3 bg-blue-600 text-white shadow-md font-semibold"><i class="fa-solid fa-gears w-6 text-center"></i><span class="sidebar-text ml-2">Pengaturan Sistem</span></a>
+                </nav>
+            </div>
+            <div class="p-4 border-t border-slate-700 bg-slate-900 shrink-0">
+                <button type="button" onclick="logoutAdmin()" class="w-full flex items-center justify-center p-2.5 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold shadow-sm cursor-pointer"><i class="fa-solid fa-right-from-bracket"></i><span class="sidebar-text ml-2">Keluar</span></button>
+            </div>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-gray-50">
+            <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0">
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleSidebar()" class="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors"><i class="fa-solid fa-bars"></i></button>
+                    <div class="h-6 w-px bg-gray-300"></div>
+                    <h2 class="text-lg font-bold text-gray-800">Pengaturan Sistem & Identitas Sekolah</h2>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-3 py-1 rounded-full uppercase">Khusus Admin</span>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
+                
+                <!-- Notifikasi Status -->
+                <div id="alert-box" class="hidden p-4 rounded-xl text-sm font-semibold shadow-sm"></div>
+
+                <form id="form-pengaturan" onsubmit="simpanPengaturan(event)" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Kolom Kiri (Identitas & Aturan Ujian) -->
+                    <div class="lg:col-span-2 space-y-6">
+                        
+                        <!-- Card Identitas Sekolah -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-5">
+                            <div class="border-b pb-4">
+                                <h3 class="font-bold text-gray-800 text-base"><i class="fa-solid fa-school text-blue-600 mr-2"></i>Identitas Instansi / Sekolah</h3>
+                                <p class="text-xs text-gray-500 mt-1">Informasi ini akan digunakan pada kop laporan, kartu peserta, dan lembar cetak leger.</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nama Sekolah</label>
+                                    <input type="text" id="nama-sekolah" value="SMAN 1 Tebing Tinggi" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-800 outline-none focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Kabupaten / Wilayah</label>
+                                    <input type="text" id="wilayah-sekolah" value="Kabupaten Balangan, Kalimantan Selatan" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-800 outline-none focus:border-blue-500">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tahun Ajaran Aktif</label>
+                                    <input type="text" id="tahun-ajaran" value="2026/2027" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-800 outline-none focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Semester Aktif</label>
+                                    <select id="semester" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-800 outline-none focus:border-blue-500">
+                                        <option value="Ganjil">Semester Ganjil</option>
+                                        <option value="Genap">Semester Genap</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nama Kepala Sekolah</label>
+                                <input type="text" id="kepala-sekolah" placeholder="Masukkan Nama Kepala Sekolah beserta Gelar" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-800 outline-none focus:border-blue-500">
+                            </div>
+                        </div>
+
+                        <!-- Card Pengaturan Keamanan & Batas Pelanggaran -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-5">
+                            <div class="border-b pb-4">
+                                <h3 class="font-bold text-gray-800 text-base"><i class="fa-solid fa-shield-halved text-red-600 mr-2"></i>Pengaturan Keamanan & Anti-Kecurangan Ujian</h3>
+                                <p class="text-xs text-gray-500 mt-1">Atur toleransi pelanggaran (keluar layar penuh, pindah tab, atau split screen) sebelum akun siswa dikunci otomatis.</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Batas Maksimal Pelanggaran (Kali)</label>
+                                    <input type="number" id="batas-pelanggaran" min="1" max="50" value="3" required class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-base font-black text-red-600 outline-none focus:border-blue-500">
+                                    <p class="text-[11px] text-gray-500 mt-1.5">Default: <strong>3 kali</strong>. Dapat diubah menjadi 5 kali atau sesuai kebutuhan kapan saja.</p>
+                                </div>
+                                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs text-slate-600 space-y-1.5">
+                                    <p class="font-bold text-slate-800"><i class="fa-solid fa-bolt text-amber-500 mr-1"></i>Berlaku Seketika (Real-time):</p>
+                                    <p>Perubahan angka ini langsung tersimpan ke server dan diterapkan otomatis pada layar ujian siswa dalam hitungan detik.</p>
+                                </div>
+                            </div>
+
+                            <div class="pt-3 border-t flex justify-end">
+                                <button type="submit" id="btn-simpan" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-md transition-colors text-sm flex items-center space-x-2 cursor-pointer">
+                                    <i class="fa-solid fa-floppy-disk"></i><span>Simpan Semua Pengaturan</span>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Panel Info & Sistem -->
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
+                            <h3 class="font-bold text-gray-800 text-base border-b pb-3"><i class="fa-solid fa-server text-emerald-600 mr-2"></i>Status Sistem & Waktu</h3>
+                            
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between py-1 border-b border-gray-100">
+                                    <span class="text-gray-500 font-medium">Zona Waktu:</span>
+                                    <span class="font-bold text-gray-800">WITA (Waktu Indonesia Tengah)</span>
+                                </div>
+                                <div class="flex justify-between py-1 border-b border-gray-100">
+                                    <span class="text-gray-500 font-medium">Backend DB:</span>
+                                    <span class="font-bold text-emerald-600">Supabase (PostgreSQL)</span>
+                                </div>
+                                <div class="flex justify-between py-1">
+                                    <span class="text-gray-500 font-medium">Status Koneksi:</span>
+                                    <span class="font-bold text-blue-600 flex items-center"><i class="fa-solid fa-circle text-[8px] text-green-500 mr-1.5 animate-pulse"></i>Terhubung</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 space-y-3">
+                            <h4 class="font-bold text-amber-800 text-sm flex items-center"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Pusat Bantuan Cepat</h4>
+                            <p class="text-xs text-amber-700 leading-relaxed">
+                                Pastikan sinkronisasi jam server dan perangkat klien (laptop siswa) selaras agar timer hitung mundur ujian berjalan presisi tanpa selisih waktu.
+                            </p>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- SCRIPT UTAMA -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script>
+        const sessionData = localStorage.getItem('userLogin');
+        if (!sessionData) {
+            window.location.href = "login.html";
+        } else if ((JSON.parse(sessionData).role || '').toLowerCase() !== 'admin') {
+            window.location.replace("dashboard_guru.html");
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const allTexts = document.querySelectorAll('.sidebar-text');
+            if (sidebar.classList.contains('w-64')) {
+                sidebar.classList.remove('w-64'); sidebar.classList.add('w-20');
+                allTexts.forEach(el => el.classList.add('hidden'));
+            } else {
+                sidebar.classList.remove('w-20'); sidebar.classList.add('w-64');
+                setTimeout(() => { allTexts.forEach(el => el.classList.remove('hidden')); }, 150);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            // 1. Muat cadangan dari localStorage terlebih dahulu
+            const savedConfig = localStorage.getItem('app_config');
+            if (savedConfig) {
+                try {
+                    const cfg = JSON.parse(savedConfig);
+                    document.getElementById('nama-sekolah').value = cfg.nama_sekolah || "SMAN 1 Tebing Tinggi";
+                    document.getElementById('wilayah-sekolah').value = cfg.wilayah || "Kabupaten Balangan, Kalimantan Selatan";
+                    document.getElementById('tahun-ajaran').value = cfg.tahun_ajaran || "2026/2027";
+                    document.getElementById('semester').value = cfg.semester || "Ganjil";
+                    document.getElementById('kepala-sekolah').value = cfg.kepala_sekolah || "";
+                    if (cfg.batas_pelanggaran) {
+                        document.getElementById('batas-pelanggaran').value = cfg.batas_pelanggaran;
+                    }
+                } catch(e) { console.error(e); }
+            }
+
+            // 2. Muat nilai terbaru dari Supabase (sumber utama lintas perangkat)
+            const { data: dbCfg } = await db
+                .from('pengaturan_sistem')
+                .select('*')
+                .eq('id', 1)
+                .maybeSingle();
+
+            if (dbCfg) {
+                if (dbCfg.nama_sekolah) document.getElementById('nama-sekolah').value = dbCfg.nama_sekolah;
+                if (dbCfg.wilayah) document.getElementById('wilayah-sekolah').value = dbCfg.wilayah;
+                if (dbCfg.tahun_ajaran) document.getElementById('tahun-ajaran').value = dbCfg.tahun_ajaran;
+                if (dbCfg.semester) document.getElementById('semester').value = dbCfg.semester;
+                if (dbCfg.kepala_sekolah !== null) document.getElementById('kepala-sekolah').value = dbCfg.kepala_sekolah;
+                if (dbCfg.batas_pelanggaran) document.getElementById('batas-pelanggaran').value = dbCfg.batas_pelanggaran;
+            }
+        });
+
+        async function simpanPengaturan(event) {
+            event.preventDefault();
+            const btn = document.getElementById('btn-simpan');
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i>Menyimpan...`;
+            btn.disabled = true;
+
+            const batasPelanggaran = Math.max(1, parseInt(document.getElementById('batas-pelanggaran').value, 10) || 3);
+
+            const configData = {
+                id: 1,
+                nama_sekolah: document.getElementById('nama-sekolah').value,
+                wilayah: document.getElementById('wilayah-sekolah').value,
+                tahun_ajaran: document.getElementById('tahun-ajaran').value,
+                semester: document.getElementById('semester').value,
+                kepala_sekolah: document.getElementById('kepala-sekolah').value,
+                batas_pelanggaran: batasPelanggaran,
+                updated_at: new Date().toISOString()
+            };
+
+            localStorage.setItem('app_config', JSON.stringify(configData));
+
+            const { error } = await db
+                .from('pengaturan_sistem')
+                .upsert(configData, { onConflict: 'id' });
+
+            btn.innerHTML = `<i class="fa-solid fa-floppy-disk mr-2"></i>Simpan Semua Pengaturan`;
+            btn.disabled = false;
+
+            const alertBox = document.getElementById('alert-box');
+            if (!error) {
+                alertBox.className = "p-4 rounded-xl text-sm font-semibold shadow-sm bg-emerald-100 text-emerald-800 border border-emerald-200 block";
+                alertBox.innerHTML = `<i class="fa-solid fa-circle-check mr-2"></i>Pengaturan sistem berhasil disimpan! Batas maksimal pelanggaran ujian aktif: <strong>${batasPelanggaran} kali</strong>.`;
+            } else {
+                alertBox.className = "p-4 rounded-xl text-sm font-semibold shadow-sm bg-red-100 text-red-800 border border-red-200 block";
+                alertBox.innerHTML = `<i class="fa-solid fa-circle-xmark mr-2"></i>Gagal menyimpan ke database: ${error.message}`;
+            }
+
+            setTimeout(() => { alertBox.classList.add('hidden'); }, 4500);
+        }
+
+        function logoutAdmin() {
+            if (confirm("Yakin ingin keluar?")) {
+                localStorage.removeItem('userLogin');
+                window.location.href = "login.html";
+            }
+        }
+    </script>
+</body>
+</html>

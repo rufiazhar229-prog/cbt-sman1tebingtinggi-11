@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Sesi Ujian & Token - CBT SMAN 1 Tebing Tinggi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style> 
+        body { font-family: 'Inter', sans-serif; } 
+        .sidebar-transition { transition: all 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="w-64 bg-slate-800 text-white flex flex-col justify-between shrink-0 z-20 shadow-xl sidebar-transition overflow-hidden">
+            <div>
+                <div class="h-16 flex items-center justify-center border-b border-slate-700 bg-slate-900 whitespace-nowrap">
+                    <i class="fa-solid fa-graduation-cap text-2xl text-teal-400"></i>
+                    <h1 id="sidebar-logo-text" class="text-lg font-bold tracking-wider ml-2 sidebar-text">CBT SMAN 1 TT</h1>
+                </div>
+                
+                <nav class="py-4 space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)] custom-scrollbar">
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-2 truncate">Menu Utama</p>
+                    <a href="dashboard.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left">
+                        <i class="fa-solid fa-gauge-high w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Dashboard</span>
+                    </a>
+                    <a href="paket_soal.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Paket & Bank Soal">
+                        <i class="fa-solid fa-folder-open w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Paket & Bank Soal</span>
+                    </a>
+                    <a href="sesi.html" class="w-full flex items-center px-6 py-3 bg-blue-600 text-white shadow-md text-left font-semibold" title="Sesi Ujian & Token">
+                        <i class="fa-solid fa-clock w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Sesi Ujian & Token</span>
+                    </a>
+
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-amber-400 uppercase tracking-wider mt-6 mb-2 truncate">Pelaksanaan & Evaluasi</p>
+                    <a href="monitor.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Monitoring Live">
+                        <i class="fa-solid fa-desktop w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Monitoring Live</span>
+                    </a>
+                    <a href="penilaian.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Penilaian & Hasil">
+                        <i class="fa-solid fa-square-poll-vertical w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Penilaian & Hasil</span>
+                    </a>
+
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-emerald-400 uppercase tracking-wider mt-6 mb-2 truncate">Area Admin</p>
+                    <a href="siswa.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Data Siswa & Kelas">
+                        <i class="fa-solid fa-users w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Data Siswa & Kelas</span>
+                    </a>
+                    <a href="guru.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Data Guru & Mapel">
+                        <i class="fa-solid fa-chalkboard-user w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Data Guru & Mapel</span>
+                    </a>
+                    <a href="pengaturan.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Pengaturan Sistem">
+                        <i class="fa-solid fa-gears w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Pengaturan Sistem</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="p-4 border-t border-slate-700 bg-slate-900 shrink-0">
+                <button type="button" onclick="logoutAdmin()" class="w-full flex items-center justify-center p-2.5 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold transition-colors shadow-sm cursor-pointer" title="Keluar">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span class="sidebar-text ml-2 whitespace-nowrap">Keluar</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- AREA KONTEN UTAMA -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-gray-50">
+            <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0">
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleSidebar()" class="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    <div class="h-6 w-px bg-gray-300"></div>
+                    <h2 class="text-lg md:text-xl font-bold text-gray-800">Manajemen Sesi Ujian & Token</h2>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="text-right hidden sm:block">
+                        <p id="admin-name" class="text-sm font-bold text-gray-800">Memuat...</p>
+                        <p class="text-[10px] text-blue-600 font-bold uppercase tracking-wider">SMAN 1 Tebing Tinggi</p>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-br from-slate-700 to-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-md">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
+                
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h3 class="text-base font-bold text-gray-800">Daftar Jadwal Sesi Ujian</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">Token sesi berstatus <strong>AKTIF</strong> diperbarui otomatis setiap <strong>5 menit</strong> (rotasi berikutnya dalam <span id="sesi-token-countdown" class="font-mono font-bold text-blue-600">05:00</span>).</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="muatDaftarSesi()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-bold flex items-center transition-all cursor-pointer" title="Refresh Token">
+                            <i class="fa-solid fa-rotate-right mr-2"></i> Refresh
+                        </button>
+                        <button onclick="bukaModalSesi()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md flex items-center transition-all cursor-pointer">
+                            <i class="fa-solid fa-calendar-plus mr-2"></i> Buat Sesi Ujian Baru
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                        <h4 class="font-bold text-gray-800 text-sm"><i class="fa-solid fa-clock text-blue-600 mr-2"></i>Jadwal Sesi Aktif & Terdaftar</h4>
+                        <span id="counter-sesi" class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">0 Sesi</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-[11px] text-gray-400 uppercase tracking-wider border-b bg-gray-50/50">
+                                    <th class="px-6 py-3 font-semibold w-12 text-center">No</th>
+                                    <th class="px-6 py-3 font-semibold">Nama Sesi & Paket Soal</th>
+                                    <th class="px-6 py-3 font-semibold text-center">Kelas Peserta</th>
+                                    <th class="px-6 py-3 font-semibold">Waktu Mulai - Selesai</th>
+                                    <th class="px-6 py-3 font-semibold text-center">Status Sesi</th>
+                                    <th class="px-6 py-3 font-semibold text-center">Token Live</th>
+                                    <th class="px-6 py-3 font-semibold text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabel-sesi-body" class="text-sm divide-y divide-gray-100">
+                                <tr><td colspan="7" class="py-10 text-center text-gray-400 italic">Memuat data sesi...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL BUAT / EDIT SESI -->
+    <div id="modal-sesi" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 id="modal-title" class="font-bold text-lg text-gray-800"><i class="fa-solid fa-calendar-days text-blue-600 mr-2"></i>Buat Sesi Ujian Baru</h3>
+                <button onclick="tutupModalSesi()" class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer">&times;</button>
+            </div>
+            <form id="form-sesi" onsubmit="simpanSesi(event)" class="space-y-4">
+                <input type="hidden" id="sesi-id">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nama Sesi Ujian</label>
+                    <input type="text" id="sesi-nama" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-800 outline-none focus:border-blue-500" placeholder="Cth: PAS Ganjil 2026">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Pilih Paket Soal</label>
+                    <select id="sesi-paket" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-800 outline-none focus:border-blue-500">
+                        <option value="">-- Pilih Paket Soal --</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Target Kelas</label>
+                        <select id="sesi-kelas" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-800 outline-none focus:border-blue-500">
+                            <option value="X">Kelas X</option>
+                            <option value="XI">Kelas XI</option>
+                            <option value="XII">Kelas XII</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Durasi (Menit)</label>
+                        <input type="number" id="sesi-durasi" value="90" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-800 outline-none focus:border-blue-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Waktu Mulai (Jam Lokal)</label>
+                        <input type="datetime-local" id="sesi-mulai" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold text-gray-800 outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Waktu Selesai (Jam Lokal)</label>
+                        <input type="datetime-local" id="sesi-selesai" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-semibold text-gray-800 outline-none focus:border-blue-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Status Sesi Awal</label>
+                    <select id="sesi-status" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-gray-800 outline-none focus:border-blue-500">
+                        <option value="aktif">AKTIF (Peserta Bisa Masuk)</option>
+                        <option value="tidak_aktif">TIDAK AKTIF (Ditutup)</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-2 pt-3 border-t">
+                    <button type="button" onclick="tutupModalSesi()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-semibold cursor-pointer">Batal</button>
+                    <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold shadow-md cursor-pointer">Simpan Sesi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('userLogin') || 'null');
+        if (!user) {
+            window.location.href = "login.html";
+        } else {
+            document.getElementById('admin-name').innerText = user.nama_lengkap || user.username;
+            muatOpsiPaket();
+            muatDaftarSesi();
+            jalankanTimerSinkronTokenSesi();
+        }
+
+        // Helper: konversi timestamp database (UTC) ke format lokal komputer untuk input datetime-local
+        function toLocalDateTimeInput(isoStr) {
+            if (!isoStr || isoStr === 'null') return '';
+            const d = new Date(isoStr);
+            if (isNaN(d.getTime())) return '';
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        function jalankanTimerSinkronTokenSesi() {
+            setInterval(() => {
+                const now = new Date();
+                const menit = now.getMinutes();
+                const detik = now.getSeconds();
+                const sisaMenit = 4 - (menit % 5);
+                const sisaDetik = 59 - detik;
+
+                const el = document.getElementById('sesi-token-countdown');
+                if (el) {
+                    el.innerText = `${String(sisaMenit).padStart(2, '0')}:${String(sisaDetik).padStart(2, '0')}`;
+                }
+
+                if ((menit % 5 === 0) && detik === 2) {
+                    muatDaftarSesi();
+                }
+            }, 1000);
+        }
+
+        function logoutAdmin() {
+            if (confirm("Apakah Bapak/Ibu yakin ingin keluar dari sistem CBT?")) {
+                localStorage.removeItem('userLogin');
+                window.location.href = "login.html";
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const allTexts = document.querySelectorAll('.sidebar-text');
+            const kategoriTitles = document.querySelectorAll('.sidebar-kategori');
+
+            if (sidebar.classList.contains('w-64')) {
+                sidebar.classList.remove('w-64');
+                sidebar.classList.add('w-20');
+                allTexts.forEach(el => el.classList.add('hidden'));
+                kategoriTitles.forEach(el => { 
+                    el.classList.remove('text-[10px]'); 
+                    el.classList.add('text-[0px]', 'text-center'); 
+                    el.innerHTML = '•••'; 
+                });
+            } else {
+                sidebar.classList.remove('w-20');
+                sidebar.classList.add('w-64');
+                setTimeout(() => { allTexts.forEach(el => el.classList.remove('hidden')); }, 150);
+                kategoriTitles[0].innerHTML = 'Menu Utama';
+                kategoriTitles[1].innerHTML = 'Pelaksanaan & Evaluasi';
+                kategoriTitles[2].innerHTML = 'Area Admin';
+                kategoriTitles.forEach(el => { 
+                    el.classList.remove('text-[0px]', 'text-center'); 
+                    el.classList.add('text-[10px]'); 
+                });
+            }
+        }
+
+        function generateTokenRandom() {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            let token = "";
+            for (let i = 0; i < 5; i++) token += chars.charAt(Math.floor(Math.random() * chars.length));
+            return token;
+        }
+
+        async function muatOpsiPaket() {
+            const { data } = await db.from('paket_soal').select('id, nama_paket, kelas');
+            const select = document.getElementById('sesi-paket');
+            if (data && data.length > 0) {
+                select.innerHTML = '<option value="">-- Pilih Paket Soal --</option>';
+                data.forEach(p => select.innerHTML += `<option value="${p.id}">${p.nama_paket} (Kelas ${p.kelas})</option>`);
+            }
+        }
+
+        async function muatDaftarSesi() {
+            const tbody = document.getElementById('tabel-sesi-body');
+
+            const { data: sesiList, error } = await db
+                .from('sesi_ujian')
+                .select('*')
+                .order('waktu_mulai', { ascending: false });
+            
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-red-500 italic">Gagal memuat data: ${error.message}</td></tr>`;
+                document.getElementById('counter-sesi').innerText = "0 Sesi";
+                return;
+            }
+
+            if (!sesiList || sesiList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-gray-400 italic">Belum ada sesi ujian yang dibuat. Klik 'Buat Sesi Ujian Baru' di atas.</td></tr>`;
+                document.getElementById('counter-sesi').innerText = "0 Sesi";
+                return;
+            }
+
+            document.getElementById('counter-sesi').innerText = `${sesiList.length} Sesi`;
+            
+            tbody.innerHTML = sesiList.map((s, idx) => {
+                const isActive = String(s.status).toLowerCase() === 'aktif';
+                const statusBadge = isActive 
+                    ? `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span> AKTIF</span>`
+                    : `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center"><span class="w-2 h-2 rounded-full bg-red-500 mr-1.5"></span> TIDAK AKTIF</span>`;
+                
+                const tglMulai = s.waktu_mulai ? new Date(s.waktu_mulai).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+                const tglSelesai = s.waktu_selesai ? new Date(s.waktu_selesai).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+
+                return `
+                    <tr class="hover:bg-gray-50 transition-colors border-b">
+                        <td class="px-6 py-4 text-center font-bold text-gray-500">${idx + 1}</td>
+                        <td class="px-6 py-4">
+                            <p class="font-bold text-gray-800">${s.nama_sesi || 'Ujian Tanpa Nama'}</p>
+                            <p class="text-xs text-blue-600 font-semibold"><i class="fa-solid fa-folder mr-1"></i>ID Paket: ${s.id_paket ? s.id_paket.substring(0, 8) + '...' : '-'}</p>
+                        </td>
+                        <td class="px-6 py-4 text-center"><span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-bold">Kelas ${s.target_kelas || s.kelas || 'X'}</span></td>
+                        <td class="px-6 py-4 text-xs text-gray-600">
+                            <p><b>Mulai:</b> ${tglMulai}</p>
+                            <p><b>Selesai:</b> ${tglSelesai}</p>
+                            <p class="text-blue-500 font-semibold mt-0.5">Durasi: ${s.durasi_menit || 90} Menit</p>
+                        </td>
+                        <td class="px-6 py-4 text-center">${statusBadge}</td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="inline-flex items-center space-x-1.5">
+                                <span class="bg-slate-100 border border-slate-300 font-mono font-bold text-blue-800 px-3 py-1 rounded-lg tracking-widest text-sm">${s.token || '-'}</span>
+                                <button type="button" onclick="acakTokenSatuSesi('${s.id}')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded-lg text-xs transition cursor-pointer" title="Acak Token Sesi Ini">
+                                    <i class="fa-solid fa-arrows-rotate"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-right space-x-1 whitespace-nowrap">
+                            <button type="button" onclick="toggleStatusSesi('${s.id}', '${s.status}')" class="${isActive ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'} px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer" title="Ubah Status">
+                                ${isActive ? 'Nonaktifkan' : 'Aktifkan'}
+                            </button>
+                            <button type="button" onclick="editSesi('${s.id}', escapeHtml('${s.nama_sesi}'), '${s.id_paket}', '${s.target_kelas || s.kelas}', '${s.durasi_menit}', '${s.waktu_mulai}', '${s.waktu_selesai}', '${s.status}')" class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer" title="Edit Jadwal">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button type="button" onclick="hapusSesi('${s.id}')" class="bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer" title="Hapus Sesi">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function acakTokenSatuSesi(idSesi) {
+            const { error } = await db.rpc('rotasi_token_per_sesi', { p_sesi_id: idSesi });
+            if (!error) {
+                muatDaftarSesi();
+            } else {
+                alert("Gagal mengacak token: " + error.message);
+            }
+        }
+
+        function escapeHtml(text) {
+            return text ? text.replace(/'/g, "\\'") : '';
+        }
+
+        function bukaModalSesi() {
+            document.getElementById('modal-title').innerHTML = `<i class="fa-solid fa-calendar-days text-blue-600 mr-2"></i>Buat Sesi Ujian Baru`;
+            document.getElementById('form-sesi').reset();
+            document.getElementById('sesi-id').value = '';
+            document.getElementById('sesi-durasi').value = 90;
+            
+            // Otomatis isi Waktu Mulai = jam komputer sekarang, Waktu Selesai = +90 menit
+            const now = new Date();
+            const end = new Date(now.getTime() + 90 * 60000);
+            document.getElementById('sesi-mulai').value = toLocalDateTimeInput(now.toISOString());
+            document.getElementById('sesi-selesai').value = toLocalDateTimeInput(end.toISOString());
+            
+            document.getElementById('modal-sesi').classList.remove('hidden');
+        }
+
+        function tutupModalSesi() { document.getElementById('modal-sesi').classList.add('hidden'); }
+
+        function editSesi(id, nama, idPaket, kelas, durasi, mulai, selesai, status) {
+            document.getElementById('modal-title').innerHTML = `<i class="fa-solid fa-pen text-blue-600 mr-2"></i>Edit Sesi Ujian`;
+            document.getElementById('sesi-id').value = id;
+            document.getElementById('sesi-nama').value = nama;
+            document.getElementById('sesi-paket').value = idPaket;
+            document.getElementById('sesi-kelas').value = kelas;
+            document.getElementById('sesi-durasi').value = durasi;
+            document.getElementById('sesi-mulai').value = toLocalDateTimeInput(mulai);
+            document.getElementById('sesi-selesai').value = toLocalDateTimeInput(selesai);
+            document.getElementById('sesi-status').value = status || 'tidak_aktif';
+            document.getElementById('modal-sesi').classList.remove('hidden');
+        }
+
+        async function simpanSesi(e) {
+            e.preventDefault();
+            const id = document.getElementById('sesi-id').value;
+            const mulaiInput = document.getElementById('sesi-mulai').value;
+            const selesaiInput = document.getElementById('sesi-selesai').value;
+
+            const payload = {
+                nama_sesi: document.getElementById('sesi-nama').value,
+                id_paket: document.getElementById('sesi-paket').value,
+                target_kelas: document.getElementById('sesi-kelas').value,
+                kelas: document.getElementById('sesi-kelas').value,
+                durasi_menit: parseInt(document.getElementById('sesi-durasi').value) || 90,
+                waktu_mulai: mulaiInput ? new Date(mulaiInput).toISOString() : null,
+                waktu_selesai: selesaiInput ? new Date(selesaiInput).toISOString() : null,
+                status: document.getElementById('sesi-status').value
+            };
+
+            if (!id) {
+                payload.token = generateTokenRandom();
+            }
+
+            let res;
+            if (id) {
+                res = await db.from('sesi_ujian').update(payload).eq('id', id);
+            } else {
+                res = await db.from('sesi_ujian').insert([payload]);
+            }
+
+            if (res.error) {
+                alert("Gagal menyimpan sesi ujian. Periksa konsol untuk detail error.");
+                console.error(res.error);
+            } else {
+                alert("Sesi ujian berhasil disimpan!");
+                tutupModalSesi();
+                muatDaftarSesi();
+            }
+        }
+
+        async function toggleStatusSesi(id, currentStatus) {
+            const newStatus = currentStatus === 'aktif' ? 'tidak_aktif' : 'aktif';
+            const { error } = await db.from('sesi_ujian').update({ status: newStatus }).eq('id', id);
+            if (!error) {
+                muatDaftarSesi();
+            } else {
+                alert("Gagal mengubah status sesi.");
+            }
+        }
+
+        async function hapusSesi(id) {
+            if (confirm("Yakin ingin menghapus sesi ujian ini?")) {
+                const { error } = await db.from('sesi_ujian').delete().eq('id', id);
+                if (!error) {
+                    muatDaftarSesi();
+                } else {
+                    alert("Gagal menghapus sesi.");
+                }
+            }
+        }
+    </script>
+</body>
+</html>

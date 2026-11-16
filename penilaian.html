@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penilaian & Hasil Ujian - CBT SMAN 1 Tebing Tinggi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Pustaka MathJax untuk Render Rumus Matematika (LaTeX) -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style> 
+        body { font-family: 'Inter', sans-serif; } 
+        .sidebar-transition { transition: all 0.3s ease-in-out; }
+        /* Pengaturan Cetak (Print) Khusus Leger */
+        @media print {
+            body { background: white !important; }
+            aside, header, .no-print { display: none !important; }
+            main { padding: 0 !important; }
+            .print-area { width: 100% !important; margin: 0 !important; box-shadow: none !important; border: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Kontainer Utama -->
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- SIDEBAR (Navigasi Kiri) -->
+        <aside id="sidebar" class="w-64 bg-slate-800 text-white flex flex-col justify-between shrink-0 z-20 shadow-xl sidebar-transition overflow-hidden">
+            <div>
+                <!-- Header Sidebar -->
+                <div class="h-16 flex items-center justify-center border-b border-slate-700 bg-slate-900 whitespace-nowrap">
+                    <i class="fa-solid fa-graduation-cap text-2xl text-teal-400"></i>
+                    <h1 id="sidebar-logo-text" class="text-lg font-bold tracking-wider ml-2 sidebar-text">CBT SMAN 1 TT</h1>
+                </div>
+                
+                <!-- Navigasi Menu -->
+                <nav class="py-4 space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)] custom-scrollbar">
+                    
+                    <!-- KATEGORI 1: MENU UTAMA -->
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-2 truncate">Menu Utama</p>
+                    
+                    <a href="dashboard.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left">
+                        <i class="fa-solid fa-gauge-high w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Dashboard</span>
+                    </a>
+                    <a href="paket_soal.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Paket & Bank Soal">
+                        <i class="fa-solid fa-folder-open w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Paket & Bank Soal</span>
+                    </a>
+                    <a href="sesi.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Sesi Ujian & Token">
+                        <i class="fa-solid fa-clock w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Sesi Ujian & Token</span>
+                    </a>
+
+                    <!-- KATEGORI 2: PELAKSANAAN & EVALUASI -->
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-amber-400 uppercase tracking-wider mt-6 mb-2 truncate">Pelaksanaan & Evaluasi</p>
+                    
+                    <a href="monitor.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Monitoring Live">
+                        <i class="fa-solid fa-desktop w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Monitoring Live</span>
+                    </a>
+                    <a href="penilaian.html" class="w-full flex items-center px-6 py-3 bg-blue-600 text-white shadow-md text-left font-semibold" title="Penilaian & Hasil">
+                        <i class="fa-solid fa-square-poll-vertical w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Penilaian & Hasil</span>
+                    </a>
+
+                    <!-- KATEGORI 3: AREA ADMIN -->
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-emerald-400 uppercase tracking-wider mt-6 mb-2 truncate">Area Admin</p>
+                    
+                    <a href="siswa.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Data Siswa & Kelas">
+                        <i class="fa-solid fa-users w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Data Siswa & Kelas</span>
+                    </a>
+                    <a href="guru.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Data Guru & Mapel">
+                        <i class="fa-solid fa-chalkboard-user w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Data Guru & Mapel</span>
+                    </a>
+                    <a href="pengaturan.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Pengaturan Sistem">
+                        <i class="fa-solid fa-gears w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Pengaturan Sistem</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Tombol Keluar -->
+            <div class="p-4 border-t border-slate-700 bg-slate-900 shrink-0">
+                <button type="button" onclick="logoutAdmin()" class="w-full flex items-center justify-center p-2.5 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold transition-colors shadow-sm cursor-pointer" title="Keluar">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span class="sidebar-text ml-2 whitespace-nowrap">Keluar</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-gray-50">
+            <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0 no-print">
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleSidebar()" class="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors cursor-pointer"><i class="fa-solid fa-bars"></i></button>
+                    <div class="h-6 w-px bg-gray-300"></div>
+                    <h2 class="text-lg font-bold text-gray-800">Rekapitulasi & Leger Nilai</h2>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 print-area">
+                
+                <!-- Panel Filter -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 grid grid-cols-1 md:grid-cols-4 gap-4 items-end no-print">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Pilih Sesi Ujian</label>
+                        <select id="pilih-sesi-nilai" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none font-semibold text-gray-800 focus:border-blue-500" onchange="kalkulasiNilaiSesi()">
+                            <option value="">-- Memuat Sesi Ujian --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Filter Kelas</label>
+                        <select id="filter-kelas" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none font-semibold text-gray-800" onchange="renderTabelNilai()">
+                            <option value="Semua">Semua Kelas</option>
+                        </select>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="window.print()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-xl shadow-sm transition-colors text-sm flex items-center justify-center space-x-1 cursor-pointer" title="Cetak Leger">
+                            <i class="fa-solid fa-print"></i><span>Leger</span>
+                        </button>
+                        <button onclick="unduhRekapNilaiCSV()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow-sm transition-colors text-sm flex items-center justify-center space-x-1 cursor-pointer" title="Unduh CSV">
+                            <i class="fa-solid fa-file-excel"></i><span>CSV</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Judul Cetak Leger (Hanya muncul saat di-print) -->
+                <div class="hidden print:block text-center mb-6">
+                    <h2 class="text-2xl font-bold uppercase">Leger Nilai Ujian</h2>
+                    <h3 class="text-lg font-semibold" id="print-judul-sesi">SMAN 1 Tebing Tinggi</h3>
+                    <p class="text-sm font-bold mt-1" id="print-kelas-sesi"></p>
+                </div>
+
+                <!-- Tabel Rekapitulasi Nilai -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center no-print">
+                        <h4 class="font-bold text-gray-800"><i class="fa-solid fa-list-ol text-blue-600 mr-2"></i>Daftar Nilai Peserta</h4>
+                        <button onclick="kalkulasiNilaiSesi()" class="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer"><i class="fa-solid fa-rotate-right mr-1"></i>Kalkulasi Ulang</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-xs text-gray-500 uppercase tracking-wider border-b border-gray-200 bg-gray-100 print:bg-white">
+                                    <th class="px-4 py-3 font-semibold text-center w-10">No</th>
+                                    <th class="px-4 py-3 font-semibold">Nama Siswa</th>
+                                    <th class="px-4 py-3 font-semibold text-center">Kelas</th>
+                                    <th class="px-4 py-3 font-semibold text-center">Skor PG</th>
+                                    <th class="px-4 py-3 font-semibold text-center">Skor Esai</th>
+                                    <th class="px-4 py-3 font-semibold text-center text-blue-600">Nilai Akhir</th>
+                                    <th class="px-4 py-3 font-semibold text-center no-print">Aksi Guru</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabel-nilai-body" class="text-sm divide-y divide-gray-100 text-gray-800">
+                                <tr><td colspan="7" class="py-10 text-center text-gray-400 italic">Pilih sesi ujian untuk memuat nilai.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL KOREKSI ESAI -->
+    <div id="modal-esai" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[90vh] overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center shrink-0">
+                <h3 class="font-bold text-gray-800"><i class="fa-solid fa-pen-to-square text-amber-500 mr-2"></i>Koreksi Esai Siswa</h3>
+                <button onclick="tutupModalEsai()" class="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <div class="px-6 py-3 bg-blue-50 border-b border-blue-100 flex justify-between items-center shrink-0">
+                <span class="font-bold text-blue-900" id="modal-nama-siswa">Nama Siswa</span>
+                <span class="text-xs font-bold bg-blue-200 text-blue-800 px-2 py-1 rounded" id="modal-kelas-siswa">Kelas</span>
+            </div>
+
+            <div id="konten-list-esai" class="p-6 overflow-y-auto flex-1 space-y-6"></div>
+
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 text-right shrink-0">
+                <button onclick="simpanKoreksiEsai()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-md transition-colors cursor-pointer"><i class="fa-solid fa-check mr-2"></i>Simpan Seluruh Nilai Esai</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT UTAMA -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script>
+        const sessionData = localStorage.getItem('userLogin');
+        let currentUser = null;
+        let dataRekapGlobal = []; 
+        let currentIdPaket = null;
+        
+        let dataEsaiAktif = [];
+        let idSiswaAktif = null;
+
+        if (!sessionData) {
+            window.location.href = "login.html";
+        } else {
+            currentUser = JSON.parse(sessionData);
+            sesuaikanSidebarUntukGuru();
+            muatOpsiSesi();
+        }
+
+        function sesuaikanSidebarUntukGuru() {
+            if (!currentUser || currentUser.role !== 'guru') return;
+            const dashboard = document.querySelector('a[href="dashboard.html"]');
+            if (dashboard) dashboard.href = 'dashboard_guru.html';
+            document.querySelectorAll('a[href="sesi.html"], a[href="siswa.html"], a[href="guru.html"], a[href="pengaturan.html"]').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.sidebar-kategori').forEach(el => {
+                if (el.textContent.trim().toLowerCase() === 'area admin') el.classList.add('hidden');
+            });
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const allTexts = document.querySelectorAll('.sidebar-text');
+            if (sidebar.classList.contains('w-64')) {
+                sidebar.classList.remove('w-64'); sidebar.classList.add('w-20');
+                allTexts.forEach(el => el.classList.add('hidden'));
+            } else {
+                sidebar.classList.remove('w-20'); sidebar.classList.add('w-64');
+                setTimeout(() => { allTexts.forEach(el => el.classList.remove('hidden')); }, 150);
+            }
+        }
+
+        async function muatOpsiSesi() {
+            const selectSesi = document.getElementById('pilih-sesi-nilai');
+            selectSesi.innerHTML = '<option value="">-- Memuat Sesi Ujian --</option>';
+
+            try {
+                let query = db.from('sesi_ujian').select('id, nama_sesi, target_kelas, id_paket');
+                if (currentUser.role === 'guru') {
+                    const { data: paketGuru } = await db.from('paket_soal').select('id').eq('pembuat', currentUser.email);
+                    const idPaketGuru = (paketGuru || []).map(p => p.id);
+                    if (idPaketGuru.length === 0) {
+                        selectSesi.innerHTML = '<option value="">-- Belum ada sesi untuk paket Anda --</option>';
+                        return;
+                    }
+                    query = query.in('id_paket', idPaketGuru);
+                }
+                const { data, error } = await query;
+                
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    selectSesi.innerHTML = '<option value="">-- Belum ada sesi ujian tersedia --</option>';
+                    return;
+                }
+
+                selectSesi.innerHTML = '<option value="">-- Pilih Sesi Ujian --</option>';
+                data.forEach(s => {
+                    selectSesi.innerHTML += `<option value="${s.id}" data-paket="${s.id_paket}">${s.nama_sesi} (Kelas ${s.target_kelas})</option>`;
+                });
+
+            } catch (err) {
+                console.error("Gagal memuat sesi:", err);
+                selectSesi.innerHTML = '<option value="">Gagal memuat sesi ujian</option>';
+            }
+        }
+
+        async function kalkulasiNilaiSesi() {
+            const selectSesi = document.getElementById('pilih-sesi-nilai');
+            const idSesi = selectSesi.value;
+            if (!idSesi) return;
+
+            currentIdPaket = selectSesi.options[selectSesi.selectedIndex].getAttribute('data-paket');
+            const namaSesi = selectSesi.options[selectSesi.selectedIndex].text;
+            document.getElementById('print-judul-sesi').innerText = `Sesi: ${namaSesi}`;
+
+            const tbody = document.getElementById('tabel-nilai-body');
+            tbody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-blue-500 font-bold"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Mengalkulasi data...</td></tr>`;
+
+            try {
+                const { data: soalData } = await db.from('bank_soal')
+                    .select('id, jenis_soal, kunci_jawaban, bobot_skor')
+                    .eq('id_paket', currentIdPaket);
+
+                const listSoal = soalData || [];
+                const arrayIdSoal = listSoal.map(s => s.id);
+
+                const { data: logData, error: errLog } = await db.from('log_ujian')
+                    .select('id_siswa, id_peserta, nama_siswa, kelas, status')
+                    .eq('id_sesi', idSesi);
+                
+                const filterSelect = document.getElementById('filter-kelas');
+                filterSelect.innerHTML = `<option value="Semua">Semua Kelas</option>`;
+
+                if (errLog || !logData || logData.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-amber-500 italic">Belum ada peserta yang masuk pada sesi ini.</td></tr>`;
+                    dataRekapGlobal = [];
+                    return;
+                }
+
+                const uniqueKelas = [...new Set(logData.map(item => item.kelas))].sort();
+                uniqueKelas.forEach(k => { 
+                    if(k && k.trim() !== "") {
+                        filterSelect.innerHTML += `<option value="${k}">Kelas ${k}</option>`; 
+                    }
+                });
+                document.getElementById('print-kelas-sesi').innerText = "Semua Kelas";
+
+                const siswaSelesai = logData.filter(s => s.status === 'selesai');
+
+                if (siswaSelesai.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-amber-500 italic">Peserta terdaftar, tetapi belum ada yang menyelesaikan ujian.</td></tr>`;
+                    dataRekapGlobal = [];
+                    return;
+                }
+
+                // 3. Ambil Jawaban peserta
+                const { data: semuaJawaban } = await db.from('jawaban_siswa')
+                    .select('*')
+                    .in('id_soal', arrayIdSoal);
+                
+                const listJawaban = semuaJawaban || [];
+                dataRekapGlobal = [];
+
+                // 4. Kalkulasi Per Siswa
+                siswaSelesai.forEach(siswa => {
+                    let skorPG = 0;
+                    let skorEsai = 0;
+                    
+                    const jwbSiswaIni = listJawaban.filter(j => 
+                        String(j.id_peserta) === String(siswa.id_peserta) ||
+                        String(j.id_peserta) === String(siswa.id_siswa) || 
+                        String(j.id_siswa) === String(siswa.id_siswa)
+                    );
+
+                    jwbSiswaIni.forEach(jwb => {
+                        const soalTerkait = listSoal.find(s => String(s.id) === String(jwb.id_soal));
+                        if (soalTerkait) {
+                            const jenis = (soalTerkait.tipe_soal || soalTerkait.tipe || soalTerkait.jenis_soal || "").toLowerCase();
+                            const isEsai = jenis.includes('esai') || jenis.includes('essay') || jenis.includes('uraian');
+                            
+                            if (isEsai) {
+                                skorEsai += Number(jwb.skor_esai || 0);
+                            } else {
+                                const kunciDB = (soalTerkait.kunci_jawaban || soalTerkait.kunci || "").trim().toUpperCase();
+                                const jawabSiswa = (jwb.jawaban_dipilih || jwb.pilihan || jwb.jawaban || jwb.opsi_pilih || "").trim().toUpperCase();
+                                const bobot = soalTerkait.bobot_skor || soalTerkait.bobot || 1;
+
+                                if (kunciDB !== "" && kunciDB === jawabSiswa) {
+                                    skorPG += Number(bobot);
+                                }
+                            }
+                        }
+                    });
+
+                    dataRekapGlobal.push({
+                        id_siswa: siswa.id_siswa,
+                        id_peserta: siswa.id_peserta || siswa.id_siswa,
+                        nama_siswa: siswa.nama_siswa,
+                        kelas: siswa.kelas || "-",
+                        skor_pg: skorPG,
+                        skor_esai: skorEsai,
+                        nilai_akhir: skorPG + skorEsai
+                    });
+                });
+
+                dataRekapGlobal.sort((a, b) => a.nama_siswa.localeCompare(b.nama_siswa));
+                renderTabelNilai();
+
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-red-500 font-bold"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Error: ${err.message}</td></tr>`;
+            }
+        }
+
+        function renderTabelNilai() {
+            const filterKls = document.getElementById('filter-kelas').value;
+            const tbody = document.getElementById('tabel-nilai-body');
+            tbody.innerHTML = "";
+
+            let dataTampil = dataRekapGlobal;
+            if (filterKls !== "Semua") {
+                dataTampil = dataRekapGlobal.filter(d => d.kelas === filterKls);
+                document.getElementById('print-kelas-sesi').innerText = `Kelas: ${filterKls}`;
+            } else {
+                document.getElementById('print-kelas-sesi').innerText = "Semua Kelas";
+            }
+
+            if (dataTampil.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-gray-500 italic">Tidak ada data untuk kelas ini.</td></tr>`;
+                return;
+            }
+
+            dataTampil.forEach((rk, index) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-blue-50 transition-colors border-b border-gray-100">
+                        <td class="px-4 py-3 text-center text-gray-500 font-bold">${index + 1}</td>
+                        <td class="px-4 py-3 font-bold">${rk.nama_siswa}</td>
+                        <td class="px-4 py-3 text-center"><span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-bold">${rk.kelas}</span></td>
+                        <td class="px-4 py-3 text-center font-bold text-gray-700">${rk.skor_pg}</td>
+                        <td class="px-4 py-3 text-center font-bold text-amber-600">${rk.skor_esai}</td>
+                        <td class="px-4 py-3 text-center"><span class="bg-blue-100 text-blue-800 font-black px-3 py-1.5 rounded-lg text-base">${rk.nilai_akhir}</span></td>
+                        <td class="px-4 py-3 text-center no-print">
+                            <button onclick="bukaModalKoreksiEsai('${rk.id_peserta}', '${rk.nama_siswa}', '${rk.kelas}')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 font-bold px-3 py-1.5 rounded-lg text-xs transition-colors cursor-pointer">
+                                <i class="fa-solid fa-pen-to-square mr-1"></i>Koreksi Esai
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function bukaModalKoreksiEsai(idSiswa, nama, kelas) {
+            idSiswaAktif = idSiswa;
+            document.getElementById('modal-nama-siswa').innerText = nama;
+            document.getElementById('modal-kelas-siswa').innerText = kelas;
+            const container = document.getElementById('konten-list-esai');
+            container.innerHTML = `<p class="text-center text-gray-500 py-10"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat soal dan jawaban...</p>`;
+            document.getElementById('modal-esai').classList.remove('hidden');
+
+            const { data: soalData } = await db.from('bank_soal')
+                .select('id, pertanyaan, teks_pertanyaan, bobot_skor, jenis_soal, tipe_soal')
+                .eq('id_paket', currentIdPaket);
+            
+            const soalEsai = (soalData || []).filter(s => {
+                const j1 = (s.jenis_soal || "").toLowerCase();
+                const j2 = (s.tipe_soal || "").toLowerCase();
+                return j1.includes('esai') || j1.includes('essay') || j1.includes('uraian') || j1.includes('tertulis') || 
+                       j2.includes('esai') || j2.includes('essay') || j2.includes('uraian') || j2.includes('tertulis') ||
+                       j1 === '2' || j2 === '2';
+            });
+
+            const arrayIdSoalEsai = soalEsai.map(s => s.id);
+            let jawabanData = [];
+            if (arrayIdSoalEsai.length > 0) {
+                const { data: jwbRes } = await db.from('jawaban_siswa')
+                    .select('id, id_soal, teks_esai, skor_esai')
+                    .eq('id_peserta', idSiswa)
+                    .in('id_soal', arrayIdSoalEsai);
+                jawabanData = jwbRes || [];
+            }
+
+            dataEsaiAktif = [];
+            container.innerHTML = "";
+
+            if (soalEsai.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 space-y-2">
+                        <i class="fa-solid fa-circle-info text-amber-500 text-3xl"></i>
+                        <p class="text-amber-700 font-bold">Paket soal ini tidak memiliki soal berjenis Esai/Uraian.</p>
+                    </div>`;
+                return;
+            }
+
+            // Loop untuk membuat record jawaban otomatis jika siswa belum menyimpannya
+            for (let idx = 0; idx < soalEsai.length; idx++) {
+                const soal = soalEsai[idx];
+                let jwb = jawabanData.find(j => String(j.id_soal) === String(soal.id));
+                
+                // Jika belum ada data baris jawaban di database, buatkan otomatis agar bisa diberi nilai
+                if (!jwb) {
+                    const { data: newJwb, error: errIns } = await db.from('jawaban_siswa').insert([{
+                        id_peserta: idSiswa,
+                        id_soal: soal.id,
+                        teks_esai: "- Siswa tidak mengisi jawaban esai -",
+                        skor_esai: 0
+                    }]).select().single();
+
+                    if (!errIns && newJwb) {
+                        jwb = newJwb;
+                        jawabanData.push(newJwb);
+                    }
+                }
+
+                const idJawaban = jwb ? jwb.id : null;
+                const teksJwb = jwb ? (jwb.teks_esai || "- Siswa tidak mengisi jawaban esai -") : "- Belum ada data jawaban siswa -";
+                const skorSkrg = jwb ? (jwb.skor_esai || 0) : 0;
+                const bobotMaks = soal.bobot_skor || 10; 
+
+                if (idJawaban) {
+                    dataEsaiAktif.push({ id_jawaban: idJawaban, element_id: `skor-esai-${idx}` });
+                }
+
+                container.innerHTML += `
+                    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-3">
+                        <div class="text-sm text-gray-700 font-semibold border-b pb-2">
+                            <span class="text-amber-600 mr-1 font-bold">Pertanyaan Esai ${idx + 1}:</span> ${soal.teks_pertanyaan || soal.pertanyaan || 'Soal tanpa teks'}
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg text-sm text-gray-800 whitespace-pre-wrap font-serif border border-gray-200">${teksJwb}</div>
+                        <div class="flex items-center justify-end space-x-3 bg-amber-50 p-3 rounded-lg border border-amber-100">
+                            <label class="text-xs font-bold text-amber-800 uppercase">Beri Nilai (Maks ${bobotMaks}):</label>
+                            <input type="number" id="skor-esai-${idx}" value="${skorSkrg}" min="0" max="${bobotMaks}" class="w-20 bg-white border border-amber-300 rounded px-3 py-1.5 text-sm font-bold text-center outline-none focus:border-amber-500">
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Trigger MathJax agar rumus LaTeX langsung ter-render menjadi simbol matematika biasa
+            if (window.MathJax) {
+                MathJax.typeset();
+            }
+        }
+
+        async function simpanKoreksiEsai() {
+            if (dataEsaiAktif.length === 0) { tutupModalEsai(); return; }
+            
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i>Menyimpan...`;
+            btn.disabled = true;
+
+            let errorCount = 0;
+            for (const item of dataEsaiAktif) {
+                const inputEl = document.getElementById(item.element_id);
+                const inputVal = inputEl ? (parseInt(inputEl.value) || 0) : 0;
+                const { error } = await db.from('jawaban_siswa').update({ skor_esai: inputVal }).eq('id', item.id_jawaban);
+                if (error) errorCount++;
+            }
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+
+            if (errorCount === 0) {
+                alert("Nilai esai berhasil disimpan!");
+                tutupModalEsai();
+                kalkulasiNilaiSesi(); 
+            } else {
+                alert(`Terjadi kesalahan saat menyimpan ${errorCount} nilai.`);
+            }
+        }
+
+        function tutupModalEsai() {
+            document.getElementById('modal-esai').classList.add('hidden');
+        }
+
+        function unduhRekapNilaiCSV() {
+            const filterKls = document.getElementById('filter-kelas').value;
+            let dataExport = dataRekapGlobal;
+            if (filterKls !== "Semua") dataExport = dataRekapGlobal.filter(d => d.kelas === filterKls);
+
+            if (dataExport.length === 0) {
+                alert("Tidak ada data nilai untuk diekspor."); return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,No,Nama Siswa,Kelas,Skor PG,Skor Esai,Nilai Akhir\r\n";
+            dataExport.forEach((row, index) => {
+                csvContent += `${index + 1},"${row.nama_siswa}","${row.kelas}",${row.skor_pg},${row.skor_esai},${row.nilai_akhir}\r\n`;
+            });
+
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csvContent));
+            link.setAttribute("download", `Leger_Nilai_${filterKls}_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        function logoutAdmin() {
+            if (confirm("Yakin ingin keluar?")) {
+                localStorage.removeItem('userLogin');
+                window.location.href = "login.html";
+            }
+        }
+    </script>
+</body>
+</html>

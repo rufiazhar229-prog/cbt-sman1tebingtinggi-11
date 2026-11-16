@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lobi Ujian - CBT SMAN 1 Tebing Tinggi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-950 min-h-screen flex items-center justify-center p-4 text-white select-none">
+
+    <!-- KONTEN UTAMA LOBI UJIAN (LAYAR NORMAL TANPA PAKSAAN FULLSCREEN) -->
+    <main class="w-full max-w-md rounded-2xl border border-slate-700 bg-slate-900 p-8 shadow-2xl space-y-6">
+        <div class="text-center space-y-2">
+            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600/20 text-2xl text-blue-400">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h1 class="text-xl font-bold">Lobi Ujian</h1>
+            <p class="text-sm text-slate-400">Masukkan token ujian dari proktor. Mode layar penuh akan aktif otomatis saat Anda masuk ke ruang soal.</p>
+        </div>
+
+        <form id="form-token" class="space-y-4">
+            <div>
+                <label class="mb-1 block text-xs font-bold uppercase text-slate-400">Token Ujian</label>
+                <input id="token-ujian" required autocomplete="off" maxlength="20" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-center font-mono font-bold tracking-[0.3em] text-blue-300 outline-none focus:border-blue-500 uppercase select-text" placeholder="ABCDE">
+            </div>
+            <button id="btn-mulai" class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 font-bold transition hover:bg-blue-700 cursor-pointer shadow-lg" type="submit">
+                <span>Masuk Ruang Ujian</span><i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <a id="link-kembali" class="block text-center text-xs text-slate-400 hover:text-white pt-1" href="login_siswa.html">Kembali ke login</a>
+        </form>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script>
+        const pending = JSON.parse(sessionStorage.getItem('siswaLoginTertunda') || 'null');
+        if (!pending) window.location.replace('login_siswa.html');
+
+        document.getElementById('form-token').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const btn = document.getElementById('btn-mulai');
+            const token = document.getElementById('token-ujian').value.trim().toUpperCase();
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Memeriksa status & token...</span>';
+
+            // 1. CEK STATUS PESERTA DI SESI TOKEN INI
+            const { data: sesiData } = await db
+                .from('sesi_ujian')
+                .select('id')
+                .eq('token_ujian', token)
+                .maybeSingle();
+
+            if (sesiData && pending.nisn) {
+                const { data: siswaData } = await db
+                    .from('siswa')
+                    .select('id')
+                    .eq('nisn', pending.nisn)
+                    .maybeSingle();
+
+                if (siswaData) {
+                    const { data: statusLama } = await db
+                        .from('peserta_ujian')
+                        .select('status_pengerjaan')
+                        .eq('id_sesi', sesiData.id)
+                        .eq('id_siswa', siswaData.id)
+                        .maybeSingle();
+
+                    if (statusLama && statusLama.status_pengerjaan === 'terkunci') {
+                        alert('AKSES DITOLAK: Akun ujian Anda dalam status TERKUNCI karena pelanggaran/diblokir proktor.\n\nSilakan hubungi Proktor/Pengawas untuk menekan tombol "Izinkan Lanjut" terlebih dahulu.');
+                        btn.disabled = false;
+                        btn.innerHTML = '<span>Masuk Ruang Ujian</span><i class="fa-solid fa-arrow-right"></i>';
+                        return;
+                    }
+                    if (statusLama && statusLama.status_pengerjaan === 'selesai') {
+                        alert('Anda sudah menyelesaikan ujian pada sesi ini dan tidak dapat masuk kembali.');
+                        btn.disabled = false;
+                        btn.innerHTML = '<span>Masuk Ruang Ujian</span><i class="fa-solid fa-arrow-right"></i>';
+                        return;
+                    }
+                }
+            }
+
+            // 2. PANGGIL RPC MASUK RUANG UJIAN
+            const { data, error } = await db.rpc('masuk_ruang_ujian', {
+                p_nisn: pending.nisn,
+                p_password: pending.password,
+                p_token: token
+            });
+
+            const hasil = data && data[0];
+            if (error || !hasil || hasil.pesan !== 'OK') {
+                alert((hasil && hasil.pesan) || (error && error.message) || 'Tidak dapat memulai ujian. Hubungi proktor.');
+                if (error) console.error('Gagal masuk ruang ujian:', error);
+                btn.disabled = false;
+                btn.innerHTML = '<span>Masuk Ruang Ujian</span><i class="fa-solid fa-arrow-right"></i>';
+                return;
+            }
+
+            // 3. VERIFIKASI ULANG STATUS PESERTA SETELAH RPC
+            if (hasil.peserta_id) {
+                const { data: cekPeserta } = await db
+                    .from('peserta_ujian')
+                    .select('status_pengerjaan')
+                    .eq('id', hasil.peserta_id)
+                    .maybeSingle();
+
+                if (cekPeserta && ['terkunci', 'selesai'].includes(cekPeserta.status_pengerjaan)) {
+                    alert(
+                        cekPeserta.status_pengerjaan === 'terkunci'
+                            ? 'AKSES DITOLAK: Akun ujian Anda masih dalam status TERKUNCI. Hubungi Proktor/Pengawas.'
+                            : 'Anda sudah menyelesaikan ujian ini.'
+                    );
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>Masuk Ruang Ujian</span><i class="fa-solid fa-arrow-right"></i>';
+                    return;
+                }
+            }
+
+            localStorage.setItem('siswaLogin', JSON.stringify({
+                id: hasil.siswa_id,
+                peserta_id: hasil.peserta_id,
+                nama_lengkap: hasil.nama_lengkap,
+                kelas: hasil.kelas,
+                id_paket: hasil.paket_id,
+                id_sesi: hasil.sesi_id,
+                log_id: hasil.log_id,
+                mulai_pada: hasil.mulai_pada,
+                batas_waktu: hasil.batas_waktu
+            }));
+
+            sessionStorage.removeItem('siswaLoginTertunda');
+            window.location.replace('ujian.html');
+        });
+    </script>
+</body>
+</html>

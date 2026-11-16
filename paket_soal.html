@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Paket Soal - CBT SMAN 1 Tebing Tinggi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style> 
+        body { font-family: 'Inter', sans-serif; } 
+        .sidebar-transition { transition: all 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Kontainer Utama -->
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- SIDEBAR (Navigasi Kiri) -->
+        <aside id="sidebar" class="w-64 bg-slate-800 text-white flex flex-col justify-between shrink-0 z-20 shadow-xl sidebar-transition overflow-hidden">
+            <div>
+                <!-- Header Sidebar -->
+                <div class="h-16 flex items-center justify-center border-b border-slate-700 bg-slate-900 whitespace-nowrap">
+                    <i class="fa-solid fa-graduation-cap text-2xl text-teal-400"></i>
+                    <h1 id="sidebar-logo-text" class="text-lg font-bold tracking-wider ml-2 sidebar-text">CBT SMAN 1 TT</h1>
+                </div>
+                
+                <!-- Navigasi Menu -->
+                <nav class="py-4 space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)] custom-scrollbar">
+                    
+                    <!-- KATEGORI 1: MENU UTAMA -->
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-2 truncate">Menu Utama</p>
+                    
+                    <a href="dashboard.html" class="w-full flex items-center px-6 py-3 bg-blue-600 text-white shadow-md text-left font-semibold">
+                        <i class="fa-solid fa-gauge-high w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Dashboard</span>
+                    </a>
+                    <a href="paket_soal.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Paket & Bank Soal">
+                        <i class="fa-solid fa-folder-open w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Paket & Bank Soal</span>
+                    </a>
+                    <a href="sesi.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Sesi Ujian & Token">
+                        <i class="fa-solid fa-clock w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Sesi Ujian & Token</span>
+                    </a>
+
+                    <!-- KATEGORI 2: PELAKSANAAN & EVALUASI -->
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-amber-400 uppercase tracking-wider mt-6 mb-2 truncate">Pelaksanaan & Evaluasi</p>
+                    
+                    <a href="monitor.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Monitoring Live">
+                        <i class="fa-solid fa-desktop w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Monitoring Live</span>
+                    </a>
+                    <a href="penilaian.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Penilaian & Hasil">
+                        <i class="fa-solid fa-square-poll-vertical w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Penilaian & Hasil</span>
+                    </a>
+
+                    <!-- KATEGORI 3: AREA ADMIN -->
+                    <p class="sidebar-kategori px-6 text-[10px] font-bold text-emerald-400 uppercase tracking-wider mt-6 mb-2 truncate">Area Admin</p>
+                    
+                    <a href="siswa.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Data Siswa & Kelas">
+                        <i class="fa-solid fa-users w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Data Siswa & Kelas</span>
+                    </a>
+                    <a href="guru.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Data Guru & Mapel">
+                        <i class="fa-solid fa-chalkboard-user w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Data Guru & Mapel</span>
+                    </a>
+                    <a href="pengaturan.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Pengaturan Sistem">
+                        <i class="fa-solid fa-gears w-6 text-center"></i>
+                        <span class="sidebar-text ml-2 whitespace-nowrap">Pengaturan Sistem</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Tombol Keluar -->
+            <div class="p-4 border-t border-slate-700 bg-slate-900 shrink-0">
+                <button type="button" onclick="logoutAdmin()" class="w-full flex items-center justify-center p-2.5 bg-red-600 hover:bg-red-700 rounded-lg text-white font-semibold transition-colors shadow-sm cursor-pointer" title="Keluar">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span class="sidebar-text ml-2 whitespace-nowrap">Keluar</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- AREA KONTEN UTAMA -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-gray-50">
+            
+            <!-- Header Atas (Dengan tombol Toggle Sidebar) -->
+            <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 shrink-0">
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleSidebar()" class="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    <div class="h-6 w-px bg-gray-300"></div>
+                    <h2 class="text-lg md:text-xl font-bold text-gray-800">Manajemen Paket Soal</h2>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="text-right hidden sm:block">
+                        <p id="admin-name" class="text-sm font-bold text-gray-800">Memuat...</p>
+                        <p id="admin-role-badge" class="text-[10px] text-blue-600 font-bold uppercase tracking-wider">Memuat...</p>
+                    </div>
+                    <div class="w-10 h-10 bg-gradient-to-br from-slate-700 to-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-md">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
+                
+                <!-- Panel Informasi & Tombol Tambah -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Daftar Paket Soal Ujian</h3>
+                        <p class="text-sm text-gray-500">Buat folder paket ujian terlebih dahulu, lalu masukkan butir-butir soal ke dalamnya.</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button type="button" onclick="bukaModalPaket()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-folder-plus"></i>
+                            <span>Buat Paket Baru</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Daftar Paket Grid -->
+                <div id="grid-paket" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Paket akan dirender di sini melalui JS -->
+                    <div class="col-span-full py-12 text-center text-gray-400 italic">Memuat data paket soal...</div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL BUAT/EDIT PAKET SOAL -->
+    <div id="modal-paket" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 id="modal-title" class="text-lg font-bold text-gray-800"><i class="fa-solid fa-folder-plus text-blue-600 mr-2"></i> Buat Paket Soal</h3>
+                <button type="button" onclick="tutupModalPaket()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+            </div>
+            
+            <form id="form-paket" class="space-y-4" onsubmit="simpanPaket(event)">
+                <input type="hidden" id="paket-id">
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nama Paket Ujian</label>
+                    <input type="text" id="paket-nama" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 font-semibold" placeholder="Contoh: PAS Ganjil Matematika 2026" required>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Mata Pelajaran</label>
+                        <select id="paket-mapel" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none font-semibold text-gray-800" required>
+                            <option value="Matematika">Pendidikan Agama dan Budi Pekerti</option>
+                            <option value="Informatika">Pendidikan Pancasila</option>
+                            <option value="Fisika">Bahasa Indonesia</option>
+                            <option value="Biologi">Matematika</option>
+                            <option value="Bahasa Indonesia">Bahasa Inggris</option>
+                            <option value="Bahasa Inggris">Sejarah</option>
+                            <option value="Bahasa Indonesia">Pendidikan Jasmani, Olahraga, dan Kesehatan</option>
+                            <option value="Bahasa Inggris">Seni dan Budaya</option>
+                            <option value="Matematika">Matematika Tingkat Lanjut</option>
+                            <option value="Informatika">Fisika</option>
+                            <option value="Fisika">Kimia</option>
+                            <option value="Biologi">Biologi</option>
+                            <option value="Bahasa Indonesia">Geografi</option>
+                            <option value="Bahasa Inggris">Sejarah Tingkat Lanjut</option>
+                            <option value="Bahasa Indonesia">Sosiologi</option>
+                            <option value="Bahasa Inggris">Bahasa Inggris</option>
+                            <option value="Bahasa Inggris">Ekonomi</option>
+                            <option value="Bahasa Indonesia">Bahasa Indonesia Tingkat Lanjut</option>
+                            <option value="Bahasa Inggris">Bahasa Inggris Tingkat Lanjut</option>
+                            <option value="Bahasa Inggris">Muatan Lokal</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Untuk Kelas</label>
+                        <select id="paket-kelas" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none font-semibold text-gray-800" required>
+                            <option value="X">Kelas X</option>
+                            <option value="XI">Kelas XI</option>
+                            <option value="XII">Kelas XII</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-3 border-t">
+                    <button type="button" onclick="tutupModalPaket()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-semibold">Batal</button>
+                    <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold shadow-md">Simpan Paket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT UTAMA -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script>
+        // Cek Login & Set Nama
+        const sessionData = localStorage.getItem('userLogin');
+        let currentUser = null;
+        if (!sessionData) {
+            window.location.href = "login.html";
+        } else {
+            currentUser = JSON.parse(sessionData);
+            document.getElementById('admin-name').innerText = currentUser.nama_lengkap;
+            document.getElementById('admin-role-badge').innerText = currentUser.role === 'admin' ? 'SMAN 1 TEBING TINGGI' : 'Guru Mapel';
+            sesuaikanSidebarUntukGuru();
+            muatPaketSoal();
+        }
+
+        function sesuaikanSidebarUntukGuru() {
+            if (!currentUser || currentUser.role !== 'guru') return;
+            const dashboard = document.querySelector('a[href="dashboard.html"]');
+            if (dashboard) dashboard.href = 'dashboard_guru.html';
+            document.querySelectorAll('a[href="sesi.html"], a[href="siswa.html"], a[href="guru.html"], a[href="pengaturan.html"]').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.sidebar-kategori').forEach(el => {
+                if (el.textContent.trim().toLowerCase() === 'area admin') el.classList.add('hidden');
+            });
+        }
+
+        // FUNGSI MINIMIZE SIDEBAR (Sama dengan Dashboard)
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const allTexts = document.querySelectorAll('.sidebar-text');
+            const kategoriTitles = document.querySelectorAll('.sidebar-kategori');
+
+            if (sidebar.classList.contains('w-64')) {
+                sidebar.classList.remove('w-64');
+                sidebar.classList.add('w-20');
+                allTexts.forEach(el => el.classList.add('hidden'));
+                kategoriTitles.forEach(el => {
+                    el.classList.remove('text-[10px]');
+                    el.classList.add('text-[0px]', 'text-center');
+                    el.innerHTML = '•••'; 
+                });
+            } else {
+                sidebar.classList.remove('w-20');
+                sidebar.classList.add('w-64');
+                setTimeout(() => {
+                    allTexts.forEach(el => el.classList.remove('hidden'));
+                }, 150);
+                kategoriTitles[0].innerHTML = 'Menu Utama';
+                kategoriTitles[1].innerHTML = 'Pelaksanaan & Evaluasi';
+                kategoriTitles[2].innerHTML = 'Area Admin';
+                kategoriTitles.forEach(el => {
+                    el.classList.remove('text-[0px]', 'text-center');
+                    el.classList.add('text-[10px]');
+                });
+            }
+        }
+
+        // FUNGSI LOGIKA PAKET SOAL (Berinteraksi dengan Supabase)
+        function bukaModalPaket() {
+            document.getElementById('modal-title').innerHTML = `<i class="fa-solid fa-folder-plus text-blue-600 mr-2"></i> Buat Paket Soal Baru`;
+            document.getElementById('form-paket').reset();
+            document.getElementById('paket-id').value = '';
+            document.getElementById('modal-paket').classList.remove('hidden');
+        }
+
+        function tutupModalPaket() { document.getElementById('modal-paket').classList.add('hidden'); }
+
+        async function muatPaketSoal() {
+            const gridContainer = document.getElementById('grid-paket');
+            gridContainer.innerHTML = '<div class="col-span-full py-12 text-center text-gray-400 italic">Memuat data paket soal...</div>';
+
+            try {
+                let query = db.from('paket_soal').select('*').order('id', { ascending: false });
+                
+                // Jika login sebagai guru, hanya tampilkan paket buatannya sendiri
+                if (currentUser && currentUser.role === 'guru') {
+                    query = query.eq('pembuat', currentUser.email);
+                }
+
+                const { data, error } = await query;
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    gridContainer.innerHTML = `
+                        <div class="col-span-full py-12 text-center border-2 border-dashed border-gray-300 rounded-2xl bg-white">
+                            <i class="fa-solid fa-folder-open text-4xl text-gray-300 mb-3"></i>
+                            <p class="text-gray-500 font-semibold">Belum ada paket soal.</p>
+                            <p class="text-xs text-gray-400 mt-1">Silakan klik "Buat Paket Baru" untuk memulai.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                gridContainer.innerHTML = "";
+                data.forEach((p) => {
+                    gridContainer.innerHTML += `
+                        <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
+                            
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <span class="inline-block px-2.5 py-1 rounded bg-blue-100 text-blue-800 text-[10px] font-bold uppercase tracking-wider mb-2">${p.mata_pelajaran} - Kls ${p.kelas}</span>
+                                    <h4 class="font-bold text-gray-800 text-lg leading-tight">${p.nama_paket}</h4>
+                                </div>
+                                <div class="bg-gray-50 rounded-lg p-2 border border-gray-100 flex flex-col items-center justify-center min-w-[50px]">
+                                    <i class="fa-regular fa-file-lines text-gray-400 mb-1"></i>
+                                    <span class="text-xs font-bold text-gray-600">Soal</span>
+                                </div>
+                            </div>
+                            
+                            <div class="text-xs text-gray-500 mb-5 flex items-center">
+                                <i class="fa-solid fa-user-pen mr-1.5 text-gray-400"></i> Pembuat: ${p.pembuat}
+                            </div>
+                            
+                            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                                <a href="soal.html?id_paket=${p.id}&nama_paket=${encodeURIComponent(p.nama_paket)}" class="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-center py-2 rounded-xl text-sm font-semibold transition-colors mr-2">
+                                    <i class="fa-solid fa-list-check mr-1"></i> Kelola Soal
+                                </a>
+                                
+                                <button onclick='editPaket(${JSON.stringify(p)})' class="w-9 h-9 rounded-xl bg-gray-50 hover:bg-blue-50 text-gray-600 hover:text-blue-600 transition-colors mr-1 flex items-center justify-center border" title="Edit Paket">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <button onclick="hapusPaket('${p.id}')" class="w-9 h-9 rounded-xl bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors flex items-center justify-center border" title="Hapus Paket">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                console.error(err);
+                gridContainer.innerHTML = '<div class="col-span-full py-12 text-center text-red-500">Gagal memuat data paket.</div>';
+            }
+        }
+
+        async function simpanPaket(e) {
+            e.preventDefault();
+            if (!currentUser || !currentUser.email) {
+                alert("Sesi login perlu diperbarui. Silakan keluar, lalu login kembali.");
+                return;
+            }
+            const id = document.getElementById('paket-id').value;
+            const payload = {
+                nama_paket: document.getElementById('paket-nama').value.trim(),
+                mata_pelajaran: document.getElementById('paket-mapel').value,
+                kelas: document.getElementById('paket-kelas').value,
+                id_guru: currentUser.id,
+                pembuat: currentUser.email
+            };
+
+            if (id) {
+                const { error } = await db.from('paket_soal').update(payload).eq('id', id);
+                if (error) { alert("Gagal memperbarui paket: " + error.message); console.error(error); }
+                else { alert("Paket berhasil diperbarui!"); tutupModalPaket(); muatPaketSoal(); }
+            } else {
+                const { error } = await db.from('paket_soal').insert([payload]);
+                if (error) { alert("Gagal menyimpan paket: " + error.message); console.error(error); }
+                else { alert("Paket berhasil dibuat! Silakan kelola soal di dalamnya."); tutupModalPaket(); muatPaketSoal(); }
+            }
+        }
+
+        function editPaket(p) {
+            document.getElementById('modal-title').innerHTML = `<i class="fa-solid fa-pen text-blue-600 mr-2"></i> Edit Paket Soal`;
+            document.getElementById('paket-id').value = p.id;
+            document.getElementById('paket-nama').value = p.nama_paket;
+            document.getElementById('paket-mapel').value = p.mata_pelajaran;
+            document.getElementById('paket-kelas').value = p.kelas;
+            document.getElementById('modal-paket').classList.remove('hidden');
+        }
+
+        async function hapusPaket(id) {
+            if (confirm("PERINGATAN! Menghapus paket ini akan memutuskan hubungan dengan semua soal di dalamnya. Yakin ingin menghapus?")) {
+                const { error } = await db.from('paket_soal').delete().eq('id', id);
+                if (error) { alert("Gagal menghapus. Pastikan paket ini tidak sedang digunakan di Sesi Ujian."); }
+                else { muatPaketSoal(); }
+            }
+        }
+
+        function logoutAdmin() {
+            if (confirm("Yakin ingin keluar?")) {
+                localStorage.removeItem('userLogin');
+                window.location.href = "login.html";
+            }
+        }
+    </script>
+</body>
+</html>
