@@ -151,21 +151,38 @@
                 <input type="hidden" id="sesi-id">
                 <div>
                     <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nama Sesi Ujian</label>
-                    <input type="text" id="sesi-nama" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-800 outline-none focus:border-blue-500" placeholder="Cth: PAS Ganjil 2026">
+                    <input type="text" id="sesi-nama" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-800 outline-none focus:border-blue-500" placeholder="Cth: PAS Ganjil PPKn Kelas X A">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Pilih Paket Soal</label>
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Pilih Paket Soal (Nama Paket — Mapel — Pembuat)</label>
                     <select id="sesi-paket" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-800 outline-none focus:border-blue-500">
                         <option value="">-- Pilih Paket Soal --</option>
                     </select>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Target Kelas</label>
+                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Target Kelas Peserta</label>
                         <select id="sesi-kelas" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-800 outline-none focus:border-blue-500">
-                            <option value="X">Kelas X</option>
-                            <option value="XI">Kelas XI</option>
-                            <option value="XII">Kelas XII</option>
+                            <optgroup label="Per Angkatan (Semua Rombel)">
+                                <option value="X">Semua Kelas X (X A, X B, X C)</option>
+                                <option value="XI">Semua Kelas XI (XI A, XI B, XI C)</option>
+                                <option value="XII">Semua Kelas XII (XII A, XII B, XII C)</option>
+                            </optgroup>
+                            <optgroup label="Kelas X Spesifik">
+                                <option value="X A">Kelas X A</option>
+                                <option value="X B">Kelas X B</option>
+                                <option value="X C">Kelas X C</option>
+                            </optgroup>
+                            <optgroup label="Kelas XI Spesifik">
+                                <option value="XI A">Kelas XI A</option>
+                                <option value="XI B">Kelas XI B</option>
+                                <option value="XI C">Kelas XI C</option>
+                            </optgroup>
+                            <optgroup label="Kelas XII Spesifik">
+                                <option value="XII A">Kelas XII A</option>
+                                <option value="XII B">Kelas XII B</option>
+                                <option value="XII C">Kelas XII C</option>
+                            </optgroup>
                         </select>
                     </div>
                     <div>
@@ -202,16 +219,16 @@
     <script src="supabase-client.js"></script>
     <script>
         const user = JSON.parse(localStorage.getItem('userLogin') || 'null');
+        let daftarPaketMap = {};
+
         if (!user) {
             window.location.href = "login.html";
         } else {
             document.getElementById('admin-name').innerText = user.nama_lengkap || user.username;
-            muatOpsiPaket();
-            muatDaftarSesi();
+            muatOpsiPaket().then(() => muatDaftarSesi());
             jalankanTimerSinkronTokenSesi();
         }
 
-        // Helper: konversi timestamp database (UTC) ke format lokal komputer untuk input datetime-local
         function toLocalDateTimeInput(isoStr) {
             if (!isoStr || isoStr === 'null') return '';
             const d = new Date(isoStr);
@@ -281,12 +298,30 @@
             return token;
         }
 
+        function formatLabelTargetKelas(kode) {
+            if (kode === 'X') return 'Semua Kelas X';
+            if (kode === 'XI') return 'Semua Kelas XI';
+            if (kode === 'XII') return 'Semua Kelas XII';
+            return `Kelas ${kode}`;
+        }
+
         async function muatOpsiPaket() {
-            const { data } = await db.from('paket_soal').select('id, nama_paket, kelas');
+            const { data } = await db
+                .from('paket_soal')
+                .select('id, nama_paket, mata_pelajaran, kelas, pembuat')
+                .order('id', { ascending: false });
+
             const select = document.getElementById('sesi-paket');
+            daftarPaketMap = {};
+
             if (data && data.length > 0) {
                 select.innerHTML = '<option value="">-- Pilih Paket Soal --</option>';
-                data.forEach(p => select.innerHTML += `<option value="${p.id}">${p.nama_paket} (Kelas ${p.kelas})</option>`);
+                data.forEach(p => {
+                    daftarPaketMap[p.id] = p;
+                    const mapelInfo = p.mata_pelajaran ? ` — ${p.mata_pelajaran}` : '';
+                    const pembuatInfo = p.pembuat ? ` | Pembuat: ${p.pembuat}` : '';
+                    select.innerHTML += `<option value="${p.id}">${p.nama_paket}${mapelInfo} (Kls ${p.kelas})${pembuatInfo}</option>`;
+                });
             }
         }
 
@@ -320,15 +355,20 @@
                 
                 const tglMulai = s.waktu_mulai ? new Date(s.waktu_mulai).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
                 const tglSelesai = s.waktu_selesai ? new Date(s.waktu_selesai).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+                const targetKode = s.target_kelas || s.kelas || 'X';
+                const paketInfo = daftarPaketMap[s.id_paket];
+                const ketPaket = paketInfo
+                    ? `${paketInfo.nama_paket} (${paketInfo.mata_pelajaran || '-'} • ${paketInfo.pembuat || '-'})`
+                    : `ID Paket: ${s.id_paket ? s.id_paket.substring(0, 8) + '...' : '-'}`;
 
                 return `
                     <tr class="hover:bg-gray-50 transition-colors border-b">
                         <td class="px-6 py-4 text-center font-bold text-gray-500">${idx + 1}</td>
                         <td class="px-6 py-4">
                             <p class="font-bold text-gray-800">${s.nama_sesi || 'Ujian Tanpa Nama'}</p>
-                            <p class="text-xs text-blue-600 font-semibold"><i class="fa-solid fa-folder mr-1"></i>ID Paket: ${s.id_paket ? s.id_paket.substring(0, 8) + '...' : '-'}</p>
+                            <p class="text-xs text-blue-600 font-semibold mt-0.5"><i class="fa-solid fa-folder-open mr-1"></i>${ketPaket}</p>
                         </td>
-                        <td class="px-6 py-4 text-center"><span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-lg text-xs font-bold">Kelas ${s.target_kelas || s.kelas || 'X'}</span></td>
+                        <td class="px-6 py-4 text-center"><span class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded-lg text-xs font-bold">${formatLabelTargetKelas(targetKode)}</span></td>
                         <td class="px-6 py-4 text-xs text-gray-600">
                             <p><b>Mulai:</b> ${tglMulai}</p>
                             <p><b>Selesai:</b> ${tglSelesai}</p>
@@ -337,7 +377,7 @@
                         <td class="px-6 py-4 text-center">${statusBadge}</td>
                         <td class="px-6 py-4 text-center">
                             <div class="inline-flex items-center space-x-1.5">
-                                <span class="bg-slate-100 border border-slate-300 font-mono font-bold text-blue-800 px-3 py-1 rounded-lg tracking-widest text-sm">${s.token || '-'}</span>
+                                <span class="bg-slate-100 border border-slate-300 font-mono font-bold text-blue-800 px-3 py-1 rounded-lg tracking-widest text-sm">${s.token || s.token_ujian || '-'}</span>
                                 <button type="button" onclick="acakTokenSatuSesi('${s.id}')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded-lg text-xs transition cursor-pointer" title="Acak Token Sesi Ini">
                                     <i class="fa-solid fa-arrows-rotate"></i>
                                 </button>
@@ -347,7 +387,7 @@
                             <button type="button" onclick="toggleStatusSesi('${s.id}', '${s.status}')" class="${isActive ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'} px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer" title="Ubah Status">
                                 ${isActive ? 'Nonaktifkan' : 'Aktifkan'}
                             </button>
-                            <button type="button" onclick="editSesi('${s.id}', escapeHtml('${s.nama_sesi}'), '${s.id_paket}', '${s.target_kelas || s.kelas}', '${s.durasi_menit}', '${s.waktu_mulai}', '${s.waktu_selesai}', '${s.status}')" class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer" title="Edit Jadwal">
+                            <button type="button" onclick="editSesi('${s.id}', '${escapeHtml(s.nama_sesi)}', '${s.id_paket}', '${targetKode}', '${s.durasi_menit}', '${s.waktu_mulai}', '${s.waktu_selesai}', '${s.status}')" class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer" title="Edit Jadwal">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
                             <button type="button" onclick="hapusSesi('${s.id}')" class="bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer" title="Hapus Sesi">
@@ -378,7 +418,6 @@
             document.getElementById('sesi-id').value = '';
             document.getElementById('sesi-durasi').value = 90;
             
-            // Otomatis isi Waktu Mulai = jam komputer sekarang, Waktu Selesai = +90 menit
             const now = new Date();
             const end = new Date(now.getTime() + 90 * 60000);
             document.getElementById('sesi-mulai').value = toLocalDateTimeInput(now.toISOString());
@@ -431,7 +470,7 @@
             }
 
             if (res.error) {
-                alert("Gagal menyimpan sesi ujian. Periksa konsol untuk detail error.");
+                alert("Gagal menyimpan sesi ujian: " + res.error.message);
                 console.error(res.error);
             } else {
                 alert("Sesi ujian berhasil disimpan!");

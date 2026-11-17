@@ -108,14 +108,22 @@
     </div>
 
     <!-- HEADER UJIAN (MODE PUTIH BERSIH & RESPONSIF HP) -->
-    <header class="bg-white border-b border-gray-200 h-16 px-3 sm:px-6 flex items-center justify-between gap-2 shrink-0 shadow-sm">
+    <header class="bg-white border-b border-gray-200 min-h-[4rem] py-2 px-3 sm:px-6 flex items-center justify-between gap-2 shrink-0 shadow-sm">
         <div class="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
             <div class="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-base sm:text-lg shadow-sm">
                 <i class="fa-solid fa-laptop-code"></i>
             </div>
             <div class="min-w-0">
-                <h1 id="lbl-nama-mapel" class="font-bold text-xs sm:text-base text-gray-900 truncate">Ujian Berbasis Komputer</h1>
-                <p id="lbl-info-siswa" class="text-[11px] sm:text-xs text-gray-500 truncate">Memuat data peserta...</p>
+                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <span class="inline-flex items-center gap-1 bg-blue-600 text-white text-[10px] sm:text-xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md shadow-xs">
+                        <i class="fa-solid fa-book-open"></i>
+                        <span id="lbl-nama-mapel">Memuat Mapel...</span>
+                    </span>
+                    <span id="lbl-paket-sesi" class="hidden sm:inline-block text-[11px] font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md truncate max-w-[260px]">
+                        Ujian CBT
+                    </span>
+                </div>
+                <p id="lbl-info-siswa" class="text-[11px] sm:text-xs text-gray-600 font-medium truncate mt-0.5">Memuat data peserta...</p>
             </div>
         </div>
 
@@ -214,11 +222,9 @@
         let timerEsai = null;
         let ujianDitutup = false;
 
-        // Penting: mulai FALSE saat baru tiba dari lobi_ujian.html, baru TRUE setelah tombol Fullscreen diklik
         let antiCheatAktif = false;
         let jedaAntiDobel = false;
 
-        // Variabel Pengaman Layar Penuh & Split Screen
         let initWidth = 0;
         let initHeight = 0;
         let sedangMengetikEsai = false;
@@ -228,6 +234,50 @@
         } else {
             dataSiswa = JSON.parse(sessionSiswa);
             verifikasiStatusSebelumMulai();
+        }
+
+        async function muatInfoMapelAktif() {
+            if (!dataSiswa) return;
+
+            let namaMapel = dataSiswa.mata_pelajaran || '';
+            let namaPaket = dataSiswa.nama_paket || '';
+            let namaSesi = dataSiswa.nama_sesi || '';
+
+            if (dataSiswa.id_paket) {
+                const { data: paket } = await db
+                    .from('paket_soal')
+                    .select('mata_pelajaran, nama_paket')
+                    .eq('id', dataSiswa.id_paket)
+                    .maybeSingle();
+
+                if (paket) {
+                    if (paket.mata_pelajaran) namaMapel = paket.mata_pelajaran;
+                    if (paket.nama_paket) namaPaket = paket.nama_paket;
+                }
+            }
+
+            if (dataSiswa.id_sesi) {
+                const { data: sesi } = await db
+                    .from('sesi_ujian')
+                    .select('nama_sesi')
+                    .eq('id', dataSiswa.id_sesi)
+                    .maybeSingle();
+
+                if (sesi && sesi.nama_sesi) {
+                    namaSesi = sesi.nama_sesi;
+                }
+            }
+
+            const elMapel = document.getElementById('lbl-nama-mapel');
+            const elDetail = document.getElementById('lbl-paket-sesi');
+
+            const mapelFinal = namaMapel || (daftarSoal[0] && daftarSoal[0].mata_pelajaran) || namaPaket || 'Ujian CBT';
+            if (elMapel) elMapel.innerText = mapelFinal;
+
+            if (elDetail) {
+                const infoTeks = [namaSesi, namaPaket].filter(Boolean).join(' • ');
+                elDetail.innerText = infoTeks || `Kelas ${dataSiswa.kelas || '-'}`;
+            }
         }
 
         async function muatBatasPelanggaranGlobal() {
@@ -269,7 +319,8 @@
                 }
             }
 
-            document.getElementById('lbl-info-siswa').innerText = `${dataSiswa.nama_lengkap} (Kls ${dataSiswa.kelas})`;
+            document.getElementById('lbl-info-siswa').innerText = `${dataSiswa.nama_lengkap} • Kelas ${dataSiswa.kelas}`;
+            await muatInfoMapelAktif();
             muatSoalUjian();
             inisialisasiAntiCheat();
         }
@@ -289,8 +340,9 @@
             }
 
             daftarSoal = data;
-            if (daftarSoal[0] && daftarSoal[0].mata_pelajaran) {
-                document.getElementById('lbl-nama-mapel').innerText = daftarSoal[0].mata_pelajaran;
+            const elMapel = document.getElementById('lbl-nama-mapel');
+            if (elMapel && (!elMapel.innerText || elMapel.innerText === 'Memuat Mapel...' || elMapel.innerText === 'Ujian CBT') && daftarSoal[0]?.mata_pelajaran) {
+                elMapel.innerText = daftarSoal[0].mata_pelajaran;
             }
 
             await muatJawabanDariDatabase();
@@ -524,7 +576,6 @@
                     console.warn('Fullscreen fallback:', e);
                 }
 
-                // Sembunyikan gerbang & aktifkan sensor pelanggaran setelah transisi layar stabil
                 ujianGate.classList.add('hidden');
                 setTimeout(() => {
                     initWidth = window.innerWidth;

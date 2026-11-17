@@ -17,13 +17,21 @@
             </div>
             <h1 class="text-xl font-bold">Lobi Ujian</h1>
             <p class="text-sm text-slate-400">Masukkan token ujian dari proktor. Mode layar penuh akan aktif otomatis saat Anda masuk ke ruang soal.</p>
+            <div id="info-peserta-lobi" class="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/80 px-3.5 py-1 text-xs font-semibold text-slate-300">
+                <i class="fa-solid fa-user-graduate text-blue-400"></i>
+                <span id="lbl-peserta-lobi">Memuat identitas...</span>
+            </div>
         </div>
 
         <form id="form-token" class="space-y-4">
             <div>
                 <label class="mb-1 block text-xs font-bold uppercase text-slate-400">Token Ujian</label>
-                <input id="token-ujian" required autocomplete="off" maxlength="20" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-center font-mono font-bold tracking-[0.3em] text-blue-300 outline-none focus:border-blue-500 uppercase select-text" placeholder="ABCDE">
+                <input id="token-ujian" required autocomplete="off" maxlength="20" oninput="cekPratinjauToken(this.value)" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-center font-mono font-bold tracking-[0.3em] text-blue-300 outline-none focus:border-blue-500 uppercase select-text" placeholder="ABCDE">
             </div>
+
+            <!-- KARTU PRATINJAU MAPEL AKTIF (MUNCUL OTOMATIS SAAT TOKEN DIKETIK) -->
+            <div id="box-preview-sesi" class="hidden rounded-xl border p-3.5 text-left transition-all"></div>
+
             <button id="btn-mulai" class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 font-bold transition hover:bg-blue-700 cursor-pointer shadow-lg" type="submit">
                 <span>Masuk Ruang Ujian</span><i class="fa-solid fa-arrow-right"></i>
             </button>
@@ -35,7 +43,127 @@
     <script src="supabase-client.js"></script>
     <script>
         const pending = JSON.parse(sessionStorage.getItem('siswaLoginTertunda') || 'null');
-        if (!pending) window.location.replace('login_siswa.html');
+        let profilSiswaLobi = null;
+        let timerCekToken = null;
+
+        if (!pending) {
+            window.location.replace('login_siswa.html');
+        } else {
+            muatProfilSiswaLobi();
+        }
+
+        async function muatProfilSiswaLobi() {
+            const lbl = document.getElementById('lbl-peserta-lobi');
+            if (pending.nama_lengkap && pending.kelas) {
+                profilSiswaLobi = { nama_lengkap: pending.nama_lengkap, kelas: pending.kelas };
+                lbl.innerText = `${pending.nama_lengkap} • Kelas ${pending.kelas}`;
+                return;
+            }
+
+            if (pending.nisn) {
+                const { data: sRes } = await db
+                    .from('siswa')
+                    .select('id, nama_lengkap, kelas')
+                    .eq('nisn', pending.nisn)
+                    .maybeSingle();
+
+                if (sRes) {
+                    profilSiswaLobi = sRes;
+                    lbl.innerText = `${sRes.nama_lengkap} • Kelas ${sRes.kelas}`;
+                    return;
+                }
+            }
+
+            lbl.innerText = `${pending.nisn || 'Peserta'}`;
+        }
+
+        function cekKecocokanKelas(kelasSiswaRaw, targetKelasRaw) {
+            const kSiswa = String(kelasSiswaRaw || '').trim().toUpperCase();
+            const kTarget = String(targetKelasRaw || '').trim().toUpperCase();
+            if (!kTarget) return true;
+            if (['X', 'XI', 'XII'].includes(kTarget)) {
+                return kSiswa === kTarget || kSiswa.startsWith(kTarget + ' ');
+            }
+            return kSiswa === kTarget;
+        }
+
+        function cekPratinjauToken(val) {
+            clearTimeout(timerCekToken);
+            const box = document.getElementById('box-preview-sesi');
+            const token = String(val || '').trim().toUpperCase();
+
+            if (token.length < 4) {
+                box.classList.add('hidden');
+                box.innerHTML = '';
+                return;
+            }
+
+            box.className = 'rounded-xl border border-slate-700 bg-slate-800/60 p-3.5 text-xs text-slate-300 flex items-center gap-2';
+            box.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-blue-400"></i><span>Memeriksa informasi mata pelajaran...</span>';
+
+            timerCekToken = setTimeout(async () => {
+                // Pastikan profil siswa sudah termuat
+                if (!profilSiswaLobi && pending?.nisn) {
+                    await muatProfilSiswaLobi();
+                }
+
+                // Cari langsung berdasarkan kolom 'token' di tabel sesi_ujian
+                const { data: sesiData, error: sesiErr } = await db
+                    .from('sesi_ujian')
+                    .select('id, nama_sesi, id_paket, target_kelas, kelas, durasi_menit, status')
+                    .eq('token', token)
+                    .maybeSingle();
+
+                if (sesiErr) {
+                    console.error('Error cek token:', sesiErr);
+                }
+
+                if (!sesiData || String(sesiData.status).toLowerCase() !== 'aktif') {
+                    box.className = 'rounded-xl border border-amber-500/40 bg-amber-950/30 p-3.5 text-xs text-amber-300 flex items-center gap-2';
+                    box.innerHTML = '<i class="fa-solid fa-circle-info"></i><span>Token belum ditemukan atau sesi ujian belum diaktifkan proktor.</span>';
+                    return;
+                }
+
+                let namaMapel = '';
+                let namaPaket = '';
+                if (sesiData.id_paket) {
+                    const { data: paket } = await db
+                        .from('paket_soal')
+                        .select('mata_pelajaran, nama_paket')
+                        .eq('id', sesiData.id_paket)
+                        .maybeSingle();
+                    if (paket) {
+                        namaMapel = paket.mata_pelajaran || '';
+                        namaPaket = paket.nama_paket || '';
+                    }
+                }
+
+                const targetSesi = sesiData.target_kelas || sesiData.kelas || '-';
+                const kelasSiswaAktif = profilSiswaLobi?.kelas || pending?.kelas || '';
+                const kelasCocok = cekKecocokanKelas(kelasSiswaAktif, targetSesi);
+                const mapelTampil = namaMapel || namaPaket || sesiData.nama_sesi || 'Ujian CBT';
+
+                if (!kelasCocok) {
+                    box.className = 'rounded-xl border border-red-500/50 bg-red-950/40 p-3.5 text-xs text-red-200 space-y-1';
+                    box.innerHTML = `
+                        <p class="font-bold text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Kelas Tidak Sesuai!</p>
+                        <p>Mapel: <strong>${mapelTampil}</strong> (${sesiData.nama_sesi || '-'})</p>
+                        <p>Token ini khusus untuk <strong>Kelas ${targetSesi}</strong>, sedangkan Anda terdaftar di <strong>Kelas ${kelasSiswaAktif || '-'}</strong>.</p>
+                    `;
+                    return;
+                }
+
+                box.className = 'rounded-xl border border-emerald-500/40 bg-emerald-950/30 p-3.5 text-xs space-y-1.5';
+                box.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400"><i class="fa-solid fa-circle-check mr-1"></i>Sesi Ujian Ditemukan</span>
+                        <span class="rounded bg-emerald-500/20 px-2 py-0.5 font-mono font-bold text-emerald-300">${sesiData.durasi_menit || 90} Menit</span>
+                    </div>
+                    <p class="text-sm font-extrabold text-white"><i class="fa-solid fa-book-open text-blue-400 mr-1.5"></i>${mapelTampil}</p>
+                    <p class="text-slate-300">${sesiData.nama_sesi || namaPaket || '-'} • Target: <strong>Kelas ${targetSesi}</strong></p>
+                `;
+            }, 300);
+        }
 
         document.getElementById('form-token').addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -46,40 +174,51 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Memeriksa status & token...</span>';
 
-            // 1. CEK STATUS PESERTA DI SESI TOKEN INI
+            // 1. CEK DATA SESI & KECOCOKAN KELAS PESERTA
             const { data: sesiData } = await db
                 .from('sesi_ujian')
-                .select('id')
-                .eq('token_ujian', token)
+                .select('id, nama_sesi, id_paket, target_kelas, kelas')
+                .eq('token', token)
                 .maybeSingle();
 
-            if (sesiData && pending.nisn) {
-                const { data: siswaData } = await db
+            let siswaData = profilSiswaLobi;
+            if (!siswaData && pending.nisn) {
+                const { data: sRes } = await db
                     .from('siswa')
-                    .select('id')
+                    .select('id, nama_lengkap, kelas')
                     .eq('nisn', pending.nisn)
                     .maybeSingle();
+                siswaData = sRes;
+            }
 
-                if (siswaData) {
-                    const { data: statusLama } = await db
-                        .from('peserta_ujian')
-                        .select('status_pengerjaan')
-                        .eq('id_sesi', sesiData.id)
-                        .eq('id_siswa', siswaData.id)
-                        .maybeSingle();
+            if (sesiData && siswaData) {
+                const targetSesi = sesiData.target_kelas || sesiData.kelas;
+                if (!cekKecocokanKelas(siswaData.kelas, targetSesi)) {
+                    alert(`AKSES DITOLAK: Token ini khusus untuk kelas ${targetSesi}, sedangkan kelas Anda terdaftar sebagai ${siswaData.kelas}.\n\nPastikan Anda memasukkan token ujian milik kelas Anda sendiri.`);
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>Masuk Ruang Ujian</span><i class="fa-solid fa-arrow-right"></i>';
+                    return;
+                }
 
-                    if (statusLama && statusLama.status_pengerjaan === 'terkunci') {
-                        alert('AKSES DITOLAK: Akun ujian Anda dalam status TERKUNCI karena pelanggaran/diblokir proktor.\n\nSilakan hubungi Proktor/Pengawas untuk menekan tombol "Izinkan Lanjut" terlebih dahulu.');
-                        btn.disabled = false;
-                        btn.innerHTML = '<span>Masuk Ruang Ujian</span><i class="fa-solid fa-arrow-right"></i>';
-                        return;
-                    }
-                    if (statusLama && statusLama.status_pengerjaan === 'selesai') {
-                        alert('Anda sudah menyelesaikan ujian pada sesi ini dan tidak dapat masuk kembali.');
-                        btn.disabled = false;
-                        btn.innerHTML = '<span>Masuk Ruang Ujian</span><i class="fa-solid fa-arrow-right"></i>';
-                        return;
-                    }
+                // Cek status terkunci / selesai
+                const { data: statusLama } = await db
+                    .from('peserta_ujian')
+                    .select('status_pengerjaan')
+                    .eq('id_sesi', sesiData.id)
+                    .eq('id_siswa', siswaData.id)
+                    .maybeSingle();
+
+                if (statusLama && statusLama.status_pengerjaan === 'terkunci') {
+                    alert('AKSES DITOLAK: Akun ujian Anda dalam status TERKUNCI karena pelanggaran/diblokir proktor.\n\nSilakan hubungi Proktor/Pengawas untuk menekan tombol "Izinkan Lanjut" terlebih dahulu.');
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>Masuk Ruang Ujian</span><i class="fa-solid fa-arrow-right"></i>';
+                    return;
+                }
+                if (statusLama && statusLama.status_pengerjaan === 'selesai') {
+                    alert('Anda sudah menyelesaikan ujian pada sesi ini dan tidak dapat masuk kembali.');
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>Masuk Ruang Ujian</span><i class="fa-solid fa-arrow-right"></i>';
+                    return;
                 }
             }
 
@@ -119,13 +258,32 @@
                 }
             }
 
+            // Ambil nama mapel & nama paket agar langsung tersedia di ruang ujian
+            let namaMapel = '';
+            let namaPaket = '';
+            const paketIdFinal = hasil.paket_id || sesiData?.id_paket;
+            if (paketIdFinal) {
+                const { data: infoPaket } = await db
+                    .from('paket_soal')
+                    .select('mata_pelajaran, nama_paket')
+                    .eq('id', paketIdFinal)
+                    .maybeSingle();
+                if (infoPaket) {
+                    namaMapel = infoPaket.mata_pelajaran || '';
+                    namaPaket = infoPaket.nama_paket || '';
+                }
+            }
+
             localStorage.setItem('siswaLogin', JSON.stringify({
                 id: hasil.siswa_id,
                 peserta_id: hasil.peserta_id,
                 nama_lengkap: hasil.nama_lengkap,
                 kelas: hasil.kelas,
-                id_paket: hasil.paket_id,
-                id_sesi: hasil.sesi_id,
+                id_paket: paketIdFinal,
+                id_sesi: hasil.sesi_id || sesiData?.id,
+                nama_sesi: sesiData?.nama_sesi || '',
+                nama_paket: namaPaket,
+                mata_pelajaran: namaMapel,
                 log_id: hasil.log_id,
                 mulai_pada: hasil.mulai_pada,
                 batas_waktu: hasil.batas_waktu

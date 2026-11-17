@@ -31,11 +31,11 @@
                     <!-- KATEGORI 1: MENU UTAMA -->
                     <p class="sidebar-kategori px-6 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-2 truncate">Menu Utama</p>
                     
-                    <a href="dashboard.html" class="w-full flex items-center px-6 py-3 bg-blue-600 text-white shadow-md text-left font-semibold">
+                    <a href="dashboard.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Dashboard">
                         <i class="fa-solid fa-gauge-high w-6 text-center"></i>
                         <span class="sidebar-text ml-2 whitespace-nowrap">Dashboard</span>
                     </a>
-                    <a href="paket_soal.html" class="w-full flex items-center px-6 py-3 hover:bg-slate-700 transition-colors text-slate-300 hover:text-white text-left" title="Paket & Bank Soal">
+                    <a href="paket_soal.html" class="w-full flex items-center px-6 py-3 bg-blue-600 text-white shadow-md text-left font-semibold" title="Paket & Bank Soal">
                         <i class="fa-solid fa-folder-open w-6 text-center"></i>
                         <span class="sidebar-text ml-2 whitespace-nowrap">Paket & Bank Soal</span>
                     </a>
@@ -125,7 +125,6 @@
 
                 <!-- Daftar Paket Grid -->
                 <div id="grid-paket" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Paket akan dirender di sini melalui JS -->
                     <div class="col-span-full py-12 text-center text-gray-400 italic">Memuat data paket soal...</div>
                 </div>
 
@@ -153,26 +152,26 @@
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Mata Pelajaran</label>
                         <select id="paket-mapel" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none font-semibold text-gray-800" required>
-                            <option value="Matematika">Pendidikan Agama dan Budi Pekerti</option>
-                            <option value="Informatika">Pendidikan Pancasila</option>
-                            <option value="Fisika">Bahasa Indonesia</option>
-                            <option value="Biologi">Matematika</option>
-                            <option value="Bahasa Indonesia">Bahasa Inggris</option>
-                            <option value="Bahasa Inggris">Sejarah</option>
-                            <option value="Bahasa Indonesia">Pendidikan Jasmani, Olahraga, dan Kesehatan</option>
-                            <option value="Bahasa Inggris">Seni dan Budaya</option>
-                            <option value="Matematika">Matematika Tingkat Lanjut</option>
-                            <option value="Informatika">Fisika</option>
-                            <option value="Fisika">Kimia</option>
-                            <option value="Biologi">Biologi</option>
-                            <option value="Bahasa Indonesia">Geografi</option>
-                            <option value="Bahasa Inggris">Sejarah Tingkat Lanjut</option>
-                            <option value="Bahasa Indonesia">Sosiologi</option>
+                            <option value="Pendidikan Agama dan Budi Pekerti">Pendidikan Agama dan Budi Pekerti</option>
+                            <option value="Pendidikan Pancasila">Pendidikan Pancasila</option>
+                            <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                            <option value="Matematika">Matematika</option>
                             <option value="Bahasa Inggris">Bahasa Inggris</option>
-                            <option value="Bahasa Inggris">Ekonomi</option>
-                            <option value="Bahasa Indonesia">Bahasa Indonesia Tingkat Lanjut</option>
-                            <option value="Bahasa Inggris">Bahasa Inggris Tingkat Lanjut</option>
-                            <option value="Bahasa Inggris">Muatan Lokal</option>
+                            <option value="Sejarah">Sejarah</option>
+                            <option value="Pendidikan Jasmani, Olahraga, dan Kesehatan">Pendidikan Jasmani, Olahraga, dan Kesehatan</option>
+                            <option value="Seni dan Budaya">Seni dan Budaya</option>
+                            <option value="Informatika">Informatika</option>
+                            <option value="Matematika Tingkat Lanjut">Matematika Tingkat Lanjut</option>
+                            <option value="Fisika">Fisika</option>
+                            <option value="Kimia">Kimia</option>
+                            <option value="Biologi">Biologi</option>
+                            <option value="Geografi">Geografi</option>
+                            <option value="Sejarah Tingkat Lanjut">Sejarah Tingkat Lanjut</option>
+                            <option value="Sosiologi">Sosiologi</option>
+                            <option value="Ekonomi">Ekonomi</option>
+                            <option value="Bahasa Indonesia Tingkat Lanjut">Bahasa Indonesia Tingkat Lanjut</option>
+                            <option value="Bahasa Inggris Tingkat Lanjut">Bahasa Inggris Tingkat Lanjut</option>
+                            <option value="Muatan Lokal">Muatan Lokal</option>
                         </select>
                     </div>
                     <div>
@@ -220,7 +219,7 @@
             });
         }
 
-        // FUNGSI MINIMIZE SIDEBAR (Sama dengan Dashboard)
+        // FUNGSI MINIMIZE SIDEBAR
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const allTexts = document.querySelectorAll('.sidebar-text');
@@ -268,7 +267,6 @@
             try {
                 let query = db.from('paket_soal').select('*').order('id', { ascending: false });
                 
-                // Jika login sebagai guru, hanya tampilkan paket buatannya sendiri
                 if (currentUser && currentUser.role === 'guru') {
                     query = query.eq('pembuat', currentUser.email);
                 }

@@ -32,11 +32,14 @@
                 <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Password</label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500"><i class="fa-solid fa-lock"></i></span>
-                    <input type="password" id="password" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white outline-none focus:border-emerald-500 font-semibold" placeholder="Masukkan password" required>
+                    <input type="password" id="password" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-11 py-3 text-sm text-white outline-none focus:border-emerald-500 font-semibold" placeholder="Masukkan password" required>
+                    <button type="button" onclick="togglePasswordVisibility('password', 'icon-mata-admin')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-emerald-400 transition-colors cursor-pointer" title="Tampilkan / Sembunyikan Password">
+                        <i id="icon-mata-admin" class="fa-solid fa-eye"></i>
+                    </button>
                 </div>
             </div>
 
-            <button type="submit" id="btn-login" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors shadow-lg text-sm flex items-center justify-center space-x-2 mt-4">
+            <button type="submit" id="btn-login" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors shadow-lg text-sm flex items-center justify-center space-x-2 mt-4 cursor-pointer">
                 <span>Masuk Panel Pengelola</span>
                 <i class="fa-solid fa-arrow-right"></i>
             </button>
@@ -47,6 +50,22 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-client.js"></script>
     <script>
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (!input || !icon) return;
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
         // Jika sudah login, langsung arahkan ke dashboard
         if (localStorage.getItem('userLogin')) {
             const existingUser = JSON.parse(localStorage.getItem('userLogin'));
@@ -62,7 +81,6 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Memeriksa...';
             btn.disabled = true;
 
-            // Cek data di tabel 'users' milik Bapak
             const { data, error } = await db.from('users')
                 .select('id, email, nama_lengkap, role')
                 .eq('email', emailInput)
@@ -71,17 +89,16 @@
 
             if (error || !data) {
                 alert("Email atau Password salah!");
-                btn.innerHTML = 'Masuk Panel Pengelola';
+                btn.innerHTML = '<span>Masuk Panel Pengelola</span><i class="fa-solid fa-arrow-right"></i>';
                 btn.disabled = false;
                 return;
             }
 
-            // Simpan data login termasuk 'role' ke localStorage
             const payloadLogin = {
                 id: data.id,
                 email: data.email,
                 nama_lengkap: data.nama_lengkap,
-                role: data.role // Akan terbaca 'admin' atau 'guru' sesuai tabel Bapak
+                role: data.role
             };
 
             localStorage.setItem('userLogin', JSON.stringify(payloadLogin));

@@ -32,11 +32,14 @@
                 <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Password Siswa</label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500"><i class="fa-solid fa-lock"></i></span>
-                    <input type="password" id="password-siswa" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white outline-none focus:border-blue-500 font-semibold" placeholder="Masukkan password" required>
+                    <input type="password" id="password-siswa" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-11 py-3 text-sm text-white outline-none focus:border-blue-500 font-semibold" placeholder="Masukkan password" required>
+                    <button type="button" onclick="togglePasswordVisibility('password-siswa', 'icon-mata-siswa')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-blue-400 transition-colors cursor-pointer" title="Tampilkan / Sembunyikan Password">
+                        <i id="icon-mata-siswa" class="fa-solid fa-eye"></i>
+                    </button>
                 </div>
             </div>
 
-            <button type="submit" id="btn-login" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-colors shadow-lg text-sm flex items-center justify-center space-x-2">
+            <button type="submit" id="btn-login" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-colors shadow-lg text-sm flex items-center justify-center space-x-2 cursor-pointer">
                 <span>Masuk Ruang Ujian</span>
                 <i class="fa-solid fa-arrow-right"></i>
             </button>
@@ -47,6 +50,22 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-client.js"></script>
     <script>
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (!input || !icon) return;
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
         async function prosesLoginSiswa(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-login');
@@ -55,7 +74,6 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Melanjutkan...';
             btn.disabled = true;
 
-            // Login tahap 1: identitas siswa. Token dimasukkan pada lobi ujian.
             const { data: siswaData, error: siswaError } = await db.from('siswa')
                 .select('*')
                 .eq('nisn', nisn)
@@ -64,13 +82,17 @@
 
             if (siswaError || !siswaData) {
                 alert("NISN/Username atau Password salah!");
-                btn.innerHTML = 'Masuk Ruang Ujian';
+                btn.innerHTML = '<span>Masuk Ruang Ujian</span><i class="fa-solid fa-arrow-right"></i>';
                 btn.disabled = false;
                 return;
             }
 
-            // Hanya bertahan di tab ini dan segera dihapus setelah token diterima.
-            sessionStorage.setItem('siswaLoginTertunda', JSON.stringify({ nisn, password }));
+            sessionStorage.setItem('siswaLoginTertunda', JSON.stringify({
+                nisn,
+                password,
+                nama_lengkap: siswaData.nama_lengkap,
+                kelas: siswaData.kelas
+            }));
             window.location.href = "lobi_ujian.html";
         }
     </script>

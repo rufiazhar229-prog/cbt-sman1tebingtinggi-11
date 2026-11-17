@@ -159,9 +159,26 @@
                             <label class="text-xs font-bold text-gray-600 uppercase">Filter Kelas:</label>
                             <select id="filter-kelas" onchange="muatDataSiswa()" class="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-800 outline-none">
                                 <option value="ALL">Semua Kelas</option>
-                                <option value="X">Kelas X</option>
-                                <option value="XI">Kelas XI</option>
-                                <option value="XII">Kelas XII</option>
+                                <optgroup label="Per Angkatan">
+                                    <option value="X">Semua Kelas X</option>
+                                    <option value="XI">Semua Kelas XI</option>
+                                    <option value="XII">Semua Kelas XII</option>
+                                </optgroup>
+                                <optgroup label="Kelas X">
+                                    <option value="X A">Kelas X A</option>
+                                    <option value="X B">Kelas X B</option>
+                                    <option value="X C">Kelas X C</option>
+                                </optgroup>
+                                <optgroup label="Kelas XI">
+                                    <option value="XI A">Kelas XI A</option>
+                                    <option value="XI B">Kelas XI B</option>
+                                    <option value="XI C">Kelas XI C</option>
+                                </optgroup>
+                                <optgroup label="Kelas XII">
+                                    <option value="XII A">Kelas XII A</option>
+                                    <option value="XII B">Kelas XII B</option>
+                                    <option value="XII C">Kelas XII C</option>
+                                </optgroup>
                             </select>
                         </div>
                     </div>
@@ -213,8 +230,25 @@
                     <input type="text" id="siswa-nama" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none" required>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Kelas (Gunakan Format Standar)</label>
-                    <input type="text" id="siswa-kelas" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none" placeholder="Contoh: X A" required>
+                    <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Kelas</label>
+                    <select id="siswa-kelas" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 outline-none focus:border-blue-500" required>
+                        <option value="">-- Pilih Kelas --</option>
+                        <optgroup label="Kelas X">
+                            <option value="X A">X A</option>
+                            <option value="X B">X B</option>
+                            <option value="X C">X C</option>
+                        </optgroup>
+                        <optgroup label="Kelas XI">
+                            <option value="XI A">XI A</option>
+                            <option value="XI B">XI B</option>
+                            <option value="XI C">XI C</option>
+                        </optgroup>
+                        <optgroup label="Kelas XII">
+                            <option value="XII A">XII A</option>
+                            <option value="XII B">XII B</option>
+                            <option value="XII C">XII C</option>
+                        </optgroup>
+                    </select>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Password Ujian</label>
@@ -228,7 +262,7 @@
         </div>
     </div>
 
-    <!-- MODAL PENGATURAN & CETAK KARTU UJIAN (LENGKAP DENGAN LOGO & TTD OPSIONAL) -->
+    <!-- MODAL PENGATURAN & CETAK KARTU UJIAN -->
     <div id="modal-cetak" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-4 max-h-[92vh] overflow-y-auto shadow-2xl">
             <div class="flex justify-between items-center border-b pb-3">
@@ -240,7 +274,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-                <!-- Kolom Kiri -->
                 <div class="md:col-span-7 space-y-3">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Pilih Kelas yang Dicetak</label>
@@ -274,7 +307,6 @@
                         </div>
                     </div>
 
-                    <!-- Pengaturan Logo Opsional -->
                     <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 flex flex-wrap items-center justify-between gap-2">
                         <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-gray-700">
                             <input type="checkbox" id="chk-cetak-logo" checked onchange="simpanPreferensiCetak()" class="w-4 h-4 text-indigo-600 rounded">
@@ -290,7 +322,6 @@
                     </div>
                 </div>
 
-                <!-- Kolom Kanan: Tanda Tangan Digital Opsional -->
                 <div class="md:col-span-5 bg-gray-50 border border-gray-200 rounded-xl p-3.5 flex flex-col justify-between space-y-2">
                     <div class="flex items-center justify-between">
                         <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-gray-700">
@@ -374,7 +405,7 @@
         function tutupModalImport() { document.getElementById('modal-import').classList.add('hidden'); }
 
         // =====================================================================
-        // PENGATURAN & LOGIKA CETAK KARTU UJIAN (LOGO, TANGGAL & TTD OPSIONAL)
+        // PENGATURAN & LOGIKA CETAK KARTU UJIAN
         // =====================================================================
         let logoKartuSrc = localStorage.getItem('cbt_kartu_logo') || 'logo-sekolah.png';
         let ttdKartuDataUrl = localStorage.getItem('cbt_kartu_ttd') || '';
@@ -459,7 +490,6 @@
             }
         }
 
-        // Kanvas Tanda Tangan Digital
         const canvasTTD = document.getElementById('canvas-ttd-kartu');
         const ctxTTD = canvasTTD.getContext('2d');
         ctxTTD.lineWidth = 2.2;
@@ -651,7 +681,16 @@
             if (error) { console.error(error); tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-red-500">Gagal memuat data</td></tr>`; return; }
             
             dataSiswaGlobal = data || [];
-            let dataTampil = filterKelas === 'ALL' ? dataSiswaGlobal : dataSiswaGlobal.filter(s => s.kelas.startsWith(filterKelas));
+            let dataTampil = dataSiswaGlobal;
+            if (filterKelas !== 'ALL') {
+                dataTampil = dataSiswaGlobal.filter(s => {
+                    const kls = String(s.kelas || '').trim().toUpperCase();
+                    if (['X', 'XI', 'XII'].includes(filterKelas)) {
+                        return kls === filterKelas || kls.startsWith(filterKelas + ' ');
+                    }
+                    return kls === filterKelas.toUpperCase();
+                });
+            }
 
             document.getElementById('counter-siswa').innerText = `${dataTampil.length} Siswa`;
             
@@ -697,7 +736,15 @@
             document.getElementById('siswa-id').value = s.id;
             document.getElementById('siswa-nisn').value = s.nisn;
             document.getElementById('siswa-nama').value = s.nama_lengkap;
-            document.getElementById('siswa-kelas').value = s.kelas;
+            const selectKelas = document.getElementById('siswa-kelas');
+            const nilaiKelas = String(s.kelas || '').trim().toUpperCase();
+            if (![...selectKelas.options].some(opt => opt.value === nilaiKelas) && nilaiKelas) {
+                const opt = document.createElement('option');
+                opt.value = nilaiKelas;
+                opt.textContent = nilaiKelas;
+                selectKelas.appendChild(opt);
+            }
+            selectKelas.value = nilaiKelas;
             document.getElementById('siswa-pass').value = s.password;
             document.getElementById('modal-siswa').classList.remove('hidden');
         }
@@ -725,10 +772,10 @@
                 const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
                 const jsonRows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
                 const dataBaru = jsonRows.map(row => ({
-                    nisn: String(row.NISN || ''),
-                    nama_lengkap: String(row.Nama_Lengkap || ''),
-                    kelas: String(row.Kelas || ''),
-                    password: String(row.Password || '')
+                    nisn: String(row.NISN || '').trim(),
+                    nama_lengkap: String(row.Nama_Lengkap || '').trim(),
+                    kelas: String(row.Kelas || '').trim().toUpperCase(),
+                    password: String(row.Password || '').trim()
                 })).filter(s => s.nisn && s.nama_lengkap);
 
                 if (dataBaru.length > 0) {
