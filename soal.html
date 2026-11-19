@@ -6,6 +6,8 @@
     <title>Kelola Butir Soal - CBT SMAN 1 Tebing Tinggi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Arab Berharakat Jelas (Noto Naskh Arabic) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
     
     <!-- Pustaka MathJax untuk Render Rumus Matematika -->
     <script>
@@ -23,10 +25,23 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     
     <style> 
-        body { font-family: 'Inter', sans-serif; } 
+        body { font-family: 'Inter', 'Noto Naskh Arabic', sans-serif; } 
         .sidebar-transition { transition: all 0.3s ease-in-out; }
         .tox .tox-tbtn--labeled .tox-tbtn__select-label { font-weight: bold !important; color: #1d4ed8 !important; }
         math-field::part(virtual-keyboard-toggle) { color: #2563eb; }
+
+        /* Penyesuaian khusus teks & blok Arab agar harakat terbaca tegas */
+        .teks-arab {
+            font-family: 'Noto Naskh Arabic', 'Inter', serif;
+            font-size: 1.35rem;
+            line-height: 2.2;
+        }
+        .teks-arab-inline {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 1.3em;
+            line-height: 2.1;
+            unicode-bidi: isolate;
+        }
 
         /* Paksa seluruh garis kolom dan baris tabel tampil tegas di Pratinjau Guru */
         #live-preview-pertanyaan table,
@@ -184,15 +199,15 @@
         </main>
     </div>
 
-    <!-- MODAL PRATINJAU / VIEW SOAL (SELURUH DETAIL) -->
-    <div id="modal-preview-soal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-2xl max-w-3xl w-full p-6 space-y-4 shadow-2xl my-8">
-            <div class="flex justify-between items-center border-b pb-3">
+    <!-- MODAL PRATINJAU / VIEW SOAL (SCROLL INTERNAL RAPI) -->
+    <div id="modal-preview-soal" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="flex justify-between items-center px-6 py-4 border-b bg-slate-50 shrink-0">
                 <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-eye text-emerald-600 mr-2"></i>Pratinjau Butir Soal</h3>
-                <button type="button" onclick="tutupModalPreview()" class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer">&times;</button>
+                <button type="button" onclick="tutupModalPreview()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold cursor-pointer leading-none">&times;</button>
             </div>
             
-            <div class="space-y-4 text-sm text-gray-800">
+            <div id="preview-scroll-body" class="flex-1 overflow-y-auto p-6 space-y-4 text-sm text-gray-800">
                 <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border">
                     <div>
                         <span id="preview-tipe" class="px-2.5 py-1 rounded-md text-xs font-bold uppercase mr-2">PG</span>
@@ -205,7 +220,7 @@
 
                 <div>
                     <p class="text-xs font-bold text-gray-500 uppercase mb-1">Pertanyaan:</p>
-                    <div id="preview-pertanyaan" class="p-4 bg-gray-50 rounded-xl border border-gray-200 leading-relaxed"></div>
+                    <div id="preview-pertanyaan" dir="auto" class="p-4 bg-gray-50 rounded-xl border border-gray-200 leading-relaxed"></div>
                 </div>
 
                 <div id="preview-area-opsi" class="space-y-2">
@@ -214,8 +229,8 @@
                 </div>
             </div>
 
-            <div class="flex justify-end pt-3 border-t">
-                <button type="button" onclick="tutupModalPreview()" class="px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-semibold cursor-pointer">Tutup</button>
+            <div class="flex justify-end px-6 py-3.5 border-t bg-slate-50 shrink-0">
+                <button type="button" onclick="tutupModalPreview()" class="px-5 py-2 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold cursor-pointer">Tutup</button>
             </div>
         </div>
     </div>
@@ -236,6 +251,7 @@
                     <p>• Rumus kimia & indeks otomatis rapi: ketik <b>H2O</b>, <b>CO2</b>, <b>H2SO4</b>.</p>
                     <p>• Pangkat & satuan otomatis rapi: ketik <b>x^2</b>, <b>10^-3</b>, <b>m/s^2</b>.</p>
                     <p>• Panah reaksi & simbol: <b>-></b> (→), <b><-></b> (⇌), <b><=</b> (≤), <b>>=</b> (≥).</p>
+                    <p>• <b>PAI & Bahasa Arab:</b> Langsung <i>copy-paste</i> teks Arab berharakat Unicode ke kolom Pertanyaan maupun Opsi A–E.</p>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Upload File Excel yang Telah Diisi (.xlsx)</label>
@@ -251,104 +267,117 @@
         </div>
     </div>
 
-    <!-- MODAL TAMBAH / EDIT SOAL (MANUAL) -->
-    <div id="modal-soal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-2xl max-w-5xl w-full p-6 space-y-4 shadow-2xl my-8">
-            <div class="flex justify-between items-center border-b pb-3">
+    <!-- MODAL TAMBAH / EDIT SOAL (MANUAL - DENGAN SCROLL INTERNAL & HEADER/FOOTER STICKY) -->
+    <div id="modal-soal" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+            
+            <!-- HEADER MODAL (TETAP DI ATAS) -->
+            <div class="flex justify-between items-center px-6 py-4 border-b bg-slate-50 shrink-0">
                 <h3 id="modal-title" class="text-lg font-bold text-gray-800"><i class="fa-solid fa-file-pen text-blue-600 mr-2"></i> Buat Butir Soal</h3>
-                <button type="button" onclick="tutupModalSoal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer">&times;</button>
+                <button type="button" onclick="tutupModalSoal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold cursor-pointer leading-none">&times;</button>
             </div>
             
-            <form id="form-soal" class="space-y-4" onsubmit="simpanSoal(event)">
-                <input type="hidden" id="soal-id">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Tipe Soal</label>
-                        <select id="soal-tipe" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none font-semibold text-gray-800" onchange="gantiTipeSoal()" required>
-                            <option value="PG">Pilihan Ganda (PG)</option>
-                            <option value="ESAI">Esai (Uraian)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Bobot Nilai (Skor)</label>
-                        <input type="number" id="soal-bobot" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none font-semibold text-gray-800" value="1" min="1" required>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="flex items-center justify-between mb-1">
-                        <label class="text-xs font-bold text-gray-600 uppercase">Teks Pertanyaan</label>
-                        <button type="button" onclick="bukaModalEquation('tinymce')" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer">
-                            <i class="fa-solid fa-square-root-variable"></i>
-                            <span>Sisipkan Equation (Rumus Word)</span>
-                        </button>
-                    </div>
-                    <textarea id="soal-pertanyaan" class="w-full"></textarea>
-                    <!-- Pratinjau Visual Pertanyaan Real-time -->
-                    <div class="mt-2 bg-slate-50 border border-slate-200 rounded-xl p-3">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-1"><i class="fa-solid fa-eye mr-1"></i>Tampilan Akhir di Layar Siswa:</p>
-                        <div id="live-preview-pertanyaan" class="text-sm text-gray-800 min-h-[24px] leading-relaxed"></div>
-                    </div>
-                </div>
-
-                <!-- SISIPKAN GAMBAR ALTERNATIF -->
-                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
-                    <h4 class="text-sm font-bold text-emerald-800 mb-2"><i class="fa-solid fa-image mr-2"></i>Sisipkan Gambar (Pilihan Alternatif)</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- FORM WRAPPER -->
+            <form id="form-soal" class="flex-1 flex flex-col overflow-hidden" onsubmit="simpanSoal(event)">
+                
+                <!-- AREA ISI FORM YANG BISA DI-SCROLL -->
+                <div id="modal-soal-scroll-body" class="flex-1 overflow-y-auto p-6 space-y-4">
+                    <input type="hidden" id="soal-id">
+                    
+                    <!-- TIPE SOAL & BOBOT NILAI (SKOR) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50/70 p-4 rounded-xl border border-blue-100">
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Pilih File Gambar (Opsional)</label>
-                            <input type="file" id="soal-gambar-manual" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:font-bold file:bg-white file:text-emerald-700 hover:file:bg-gray-50 cursor-pointer border border-emerald-200 rounded-lg">
+                            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Tipe Soal</label>
+                            <select id="soal-tipe" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-sm outline-none font-semibold text-gray-800 focus:ring-2 focus:ring-blue-500" onchange="gantiTipeSoal()" required>
+                                <option value="PG">Pilihan Ganda (PG)</option>
+                                <option value="ESAI">Esai (Uraian)</option>
+                            </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Posisi Tata Letak Gambar</label>
-                            <select id="soal-gambar-posisi" class="w-full bg-white border border-emerald-200 rounded-lg px-3 py-1.5 text-xs font-semibold outline-none text-gray-700">
-                                <option value="atas">Di Atas Teks Pertanyaan</option>
-                                <option value="bawah">Di Bawah Teks Pertanyaan</option>
-                                <option value="tengah">Di Tengah (Center)</option>
+                            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Bobot Nilai (Skor)</label>
+                            <input type="number" id="soal-bobot" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-sm outline-none font-bold text-blue-700 focus:ring-2 focus:ring-blue-500" value="1" min="1" step="any" required>
+                        </div>
+                    </div>
+
+                    <!-- TEKS PERTANYAAN -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="text-xs font-bold text-gray-600 uppercase">Teks Pertanyaan (Mendukung Rumus & Huruf Arab)</label>
+                            <button type="button" onclick="bukaModalEquation('tinymce')" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer">
+                                <i class="fa-solid fa-square-root-variable"></i>
+                                <span>Sisipkan Equation (Rumus Word)</span>
+                            </button>
+                        </div>
+                        <textarea id="soal-pertanyaan" class="w-full"></textarea>
+                        <!-- Pratinjau Visual Pertanyaan Real-time -->
+                        <div class="mt-2 bg-slate-50 border border-slate-200 rounded-xl p-3">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase mb-1"><i class="fa-solid fa-eye mr-1"></i>Tampilan Akhir di Layar Siswa:</p>
+                            <div id="live-preview-pertanyaan" dir="auto" class="text-sm text-gray-800 min-h-[24px] leading-relaxed"></div>
+                        </div>
+                    </div>
+
+                    <!-- SISIPKAN GAMBAR ALTERNATIF -->
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                        <h4 class="text-sm font-bold text-emerald-800 mb-2"><i class="fa-solid fa-image mr-2"></i>Sisipkan Gambar (Pilihan Alternatif)</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Pilih File Gambar (Opsional)</label>
+                                <input type="file" id="soal-gambar-manual" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:font-bold file:bg-white file:text-emerald-700 hover:file:bg-gray-50 cursor-pointer border border-emerald-200 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-600 uppercase mb-1">Posisi Tata Letak Gambar</label>
+                                <select id="soal-gambar-posisi" class="w-full bg-white border border-emerald-200 rounded-lg px-3 py-1.5 text-xs font-semibold outline-none text-gray-700">
+                                    <option value="atas">Di Atas Teks Pertanyaan</option>
+                                    <option value="bawah">Di Bawah Teks Pertanyaan</option>
+                                    <option value="tengah">Di Tengah (Center)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BAGIAN OPSI PILIHAN GANDA -->
+                    <div id="area-pg" class="space-y-3 pt-4 border-t">
+                        <p class="text-xs font-bold text-gray-600 uppercase mb-3">Opsi Jawaban (Pilihan Ganda - Mendukung Teks Arab & Rumus)</p>
+                        <script>
+                            ['A', 'B', 'C', 'D', 'E'].forEach(h => {
+                                const low = h.toLowerCase();
+                                document.write(`
+                                    <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-2">
+                                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                                            <span class="font-black text-lg text-gray-700 w-8 text-center">${h}.</span>
+                                            <input type="text" id="opsi-${low}" dir="auto" oninput="renderPreviewOpsi('${low}')" class="flex-1 w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ketik teks Indonesia, Arab, atau klik Rumus">
+                                            <input type="hidden" id="opsi-${low}-img-lama" value="">
+                                            <button type="button" onclick="bukaModalEquation('opsi-${low}')" class="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-bold whitespace-nowrap flex items-center gap-1 cursor-pointer" title="Ketik Rumus Seperti Word">
+                                                <i class="fa-solid fa-square-root-variable"></i>
+                                                <span>Rumus</span>
+                                            </button>
+                                            <div class="flex items-center space-x-2 w-full sm:w-auto bg-white px-2 py-1 rounded border border-gray-200">
+                                                <i class="fa-regular fa-image text-gray-400"></i>
+                                                <input type="file" id="opsi-${low}-img-file" accept="image/*" class="w-40 text-[11px] text-gray-500 file:py-1 file:px-2 file:rounded file:border-0 file:bg-gray-100 file:text-gray-700 cursor-pointer">
+                                            </div>
+                                        </div>
+                                        <div id="preview-opsi-${low}" dir="auto" class="hidden pl-10 text-sm text-blue-900 bg-white/80 px-3 py-1.5 rounded-lg border border-blue-100"></div>
+                                    </div>
+                                `);
+                            });
+                        </script>
+                        <div class="pt-3">
+                            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Pilih Kunci Jawaban Benar</label>
+                            <select id="kunci-pg" class="w-48 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none font-bold text-green-700 focus:ring-2 focus:ring-green-500">
+                                <option value="A">Opsi A</option><option value="B">Opsi B</option><option value="C">Opsi C</option><option value="D">Opsi D</option><option value="E">Opsi E</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <!-- Bagian Opsi Pilihan Ganda -->
-                <div id="area-pg" class="space-y-3 pt-4 border-t">
-                    <p class="text-xs font-bold text-gray-600 uppercase mb-3">Opsi Jawaban (Pilihan Ganda)</p>
-                    <script>
-                        ['A', 'B', 'C', 'D', 'E'].forEach(h => {
-                            const low = h.toLowerCase();
-                            document.write(`
-                                <div class="bg-gray-50 p-3 rounded-xl border border-gray-200 space-y-2">
-                                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                                        <span class="font-black text-lg text-gray-700 w-8 text-center">${h}.</span>
-                                        <input type="text" id="opsi-${low}" oninput="renderPreviewOpsi('${low}')" class="flex-1 w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ketik teks atau klik tombol Rumus di kanan">
-                                        <button type="button" onclick="bukaModalEquation('opsi-${low}')" class="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-bold whitespace-nowrap flex items-center gap-1 cursor-pointer" title="Ketik Rumus Seperti Word">
-                                            <i class="fa-solid fa-square-root-variable"></i>
-                                            <span>Rumus</span>
-                                        </button>
-                                        <div class="flex items-center space-x-2 w-full sm:w-auto bg-white px-2 py-1 rounded border border-gray-200">
-                                            <i class="fa-regular fa-image text-gray-400"></i>
-                                            <input type="file" id="opsi-${low}-img-file" accept="image/*" class="w-40 text-[11px] text-gray-500 file:py-1 file:px-2 file:rounded file:border-0 file:bg-gray-100 file:text-gray-700 cursor-pointer">
-                                        </div>
-                                    </div>
-                                    <div id="preview-opsi-${low}" class="hidden pl-10 text-sm text-blue-900 bg-white/80 px-3 py-1.5 rounded-lg border border-blue-100"></div>
-                                </div>
-                            `);
-                        });
-                    </script>
-                    <div class="pt-3">
-                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Pilih Kunci Jawaban Benar</label>
-                        <select id="kunci-pg" class="w-48 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none font-bold text-green-700 focus:ring-2 focus:ring-green-500">
-                            <option value="A">Opsi A</option><option value="B">Opsi B</option><option value="C">Opsi C</option><option value="D">Opsi D</option><option value="E">Opsi E</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="flex justify-end space-x-3 pt-5 border-t mt-4">
-                    <button type="button" onclick="tutupModalSoal()" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-semibold cursor-pointer">Batal</button>
+                <!-- FOOTER MODAL (TOMBOL SIMPAN TETAP DI BAWAH) -->
+                <div class="flex justify-end space-x-3 px-6 py-4 border-t bg-slate-50 shrink-0">
+                    <button type="button" onclick="tutupModalSoal()" class="px-5 py-2.5 bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold cursor-pointer">Batal</button>
                     <button type="submit" id="btn-simpan-soal" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold shadow-md cursor-pointer flex items-center">
                         <i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Soal
                     </button>
                 </div>
+
             </form>
         </div>
     </div>
@@ -416,6 +445,15 @@
         let idPaketAktif = null;
         let namaPaketAktif = null;
         let targetInputEquation = 'tinymce';
+
+        // Helper deteksi karakter Arab (Unicode Arabic Block)
+        function mengandungArab(teks) {
+            return /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(String(teks || ''));
+        }
+
+        function kelasArab(teks) {
+            return mengandungArab(teks) ? 'teks-arab' : '';
+        }
 
         if (!sessionData) {
             window.location.href = "login.html";
@@ -527,7 +565,8 @@
             const box = document.getElementById('live-preview-pertanyaan');
             if (!ed || !box) return;
             const isi = ed.getContent();
-            box.innerHTML = isi || '<span class="text-slate-400 italic text-xs">Tampilan pertanyaan beserta rumus akan muncul di sini...</span>';
+            box.classList.toggle('teks-arab', mengandungArab(isi));
+            box.innerHTML = isi || '<span class="text-slate-400 italic text-xs">Tampilan pertanyaan beserta rumus atau teks Arab akan muncul di sini...</span>';
             if (window.MathJax && window.MathJax.typesetPromise) {
                 MathJax.typesetPromise([box]).catch(() => {});
             }
@@ -536,15 +575,19 @@
         function renderPreviewOpsi(huruf) {
             const input = document.getElementById(`opsi-${huruf}`);
             const preview = document.getElementById(`preview-opsi-${huruf}`);
+            const imgLama = document.getElementById(`opsi-${huruf}-img-lama`)?.value || '';
             if (!input || !preview) return;
             const val = input.value.trim();
-            if (!val) {
+            const isArab = mengandungArab(val);
+            input.classList.toggle('teks-arab', isArab);
+            if (!val && !imgLama) {
                 preview.classList.add('hidden');
                 preview.innerHTML = '';
                 return;
             }
             preview.classList.remove('hidden');
-            preview.innerHTML = `<span class="text-[10px] font-bold text-blue-500 uppercase mr-2">Tampilan:</span> ${val}`;
+            const imgBadge = imgLama ? `<div class="mt-1 text-[11px] text-emerald-700 font-semibold" dir="ltr"><i class="fa-solid fa-image mr-1"></i>Gambar opsi tersimpan</div>` : '';
+            preview.innerHTML = `<div class="text-[10px] font-bold text-blue-500 uppercase mb-0.5" dir="ltr">Tampilan di Layar Siswa:</div><div dir="auto" class="${isArab ? 'teks-arab' : ''}">${val}</div>${imgBadge}`;
             if (window.MathJax && window.MathJax.typesetPromise) {
                 MathJax.typesetPromise([preview]).catch(() => {});
             }
@@ -553,11 +596,11 @@
         function InisialisasiEditorWord() {
             tinymce.init({
                 selector: '#soal-pertanyaan',
-                height: 280,
+                height: 250,
                 menubar: false,
-                plugins: ['advlist', 'lists', 'image', 'charmap', 'preview', 'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen', 'insertdatetime', 'media', 'table', 'wordcount'],
-                toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | table image charmap mathequation | removeformat',
-                content_style: 'body { font-family:Inter,sans-serif; font-size:14px; }',
+                plugins: ['advlist', 'lists', 'image', 'charmap', 'preview', 'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen', 'insertdatetime', 'media', 'table', 'wordcount', 'directionality'],
+                toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | ltr rtl | bullist numlist | table image charmap mathequation | removeformat',
+                content_style: "@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&display=swap'); body { font-family: 'Inter', 'Noto Naskh Arabic', sans-serif; font-size: 16px; line-height: 1.9; }",
                 setup: function (editor) {
                     editor.ui.registry.addButton('mathequation', {
                         text: 'π Equation',
@@ -582,13 +625,16 @@
             document.getElementById('soal-gambar-posisi').value = 'atas';
             ['a', 'b', 'c', 'd', 'e'].forEach(h => {
                 document.getElementById(`opsi-${h}-img-file`).value = '';
+                document.getElementById(`opsi-${h}-img-lama`).value = '';
                 renderPreviewOpsi(h);
             });
             if (tinymce.get('soal-pertanyaan')) {
                 tinymce.get('soal-pertanyaan').setContent('');
             }
             updateLivePreviewPertanyaan();
+            gantiTipeSoal();
             document.getElementById('modal-soal').classList.remove('hidden');
+            document.getElementById('modal-soal-scroll-body').scrollTop = 0;
         }
 
         function tutupModalSoal() { document.getElementById('modal-soal').classList.add('hidden'); }
@@ -605,7 +651,6 @@
                 tinymce.get('soal-pertanyaan').setContent(s.teks_pertanyaan || s.pertanyaan || '');
             }
             updateLivePreviewPertanyaan();
-
             gantiTipeSoal();
 
             if ((s.tipe_soal || s.tipe) === 'PG') {
@@ -613,6 +658,7 @@
                 ['a', 'b', 'c', 'd', 'e'].forEach(h => {
                     const key = h.toUpperCase();
                     document.getElementById(`opsi-${h}`).value = (opsiObj[key] && opsiObj[key].teks) ? opsiObj[key].teks : '';
+                    document.getElementById(`opsi-${h}-img-lama`).value = (opsiObj[key] && opsiObj[key].gambar) ? opsiObj[key].gambar : '';
                     document.getElementById(`opsi-${h}-img-file`).value = '';
                     renderPreviewOpsi(h);
                 });
@@ -621,18 +667,23 @@
             document.getElementById('soal-gambar-manual').value = '';
             document.getElementById('soal-gambar-posisi').value = 'atas';
             document.getElementById('modal-soal').classList.remove('hidden');
+            document.getElementById('modal-soal-scroll-body').scrollTop = 0;
         }
 
         // --- FITUR PRATINJAU (VIEW) SOAL DI MENU AKSI ---
         function bukaModalPreview(sStr) {
             const s = JSON.parse(decodeURIComponent(sStr));
             const tipe = s.tipe_soal || s.tipe || 'PG';
+            const teksSoal = s.teks_pertanyaan || s.pertanyaan || '-';
             
             document.getElementById('preview-tipe').className = `px-2.5 py-1 rounded-md text-xs font-bold uppercase mr-2 ${tipe === 'PG' ? 'bg-indigo-100 text-indigo-700' : 'bg-amber-100 text-amber-700'}`;
             document.getElementById('preview-tipe').innerText = tipe;
             document.getElementById('preview-bobot').innerText = s.bobot_nilai || s.bobot_skor || 1;
             document.getElementById('preview-kunci').innerText = s.kunci_jawaban || s.kunci || 'Kebijakan Guru';
-            document.getElementById('preview-pertanyaan').innerHTML = s.teks_pertanyaan || s.pertanyaan || '-';
+
+            const prevPertanyaan = document.getElementById('preview-pertanyaan');
+            prevPertanyaan.className = `p-4 bg-gray-50 rounded-xl border border-gray-200 leading-relaxed ${kelasArab(teksSoal)}`;
+            prevPertanyaan.innerHTML = teksSoal;
 
             const areaOpsi = document.getElementById('preview-area-opsi');
             const listOpsi = document.getElementById('preview-list-opsi');
@@ -645,14 +696,15 @@
                 ['A', 'B', 'C', 'D', 'E'].forEach(h => {
                     const item = opsiObj[h];
                     if (item && (item.teks || item.gambar)) {
+                        const teksOpsi = item.teks || '';
                         let imgHtml = item.gambar ? `<div class="mt-2"><img src="${item.gambar}" style="max-height:120px; border-radius:6px;"></div>` : '';
                         let isKunci = (s.kunci_jawaban || s.kunci) === h ? 'border-green-500 bg-green-50/50 font-bold' : 'border-gray-200 bg-gray-50';
                         
                         listOpsi.innerHTML += `
                             <div class="flex items-start p-3 rounded-xl border ${isKunci}">
-                                <span class="font-black w-8 text-blue-600">${h}.</span>
-                                <div class="flex-1">
-                                    <span>${item.teks || ''}</span>
+                                <span class="font-black w-8 shrink-0 text-blue-600 pt-0.5">${h}.</span>
+                                <div dir="auto" class="flex-1 ${kelasArab(teksOpsi)}">
+                                    <span>${teksOpsi}</span>
                                     ${imgHtml}
                                 </div>
                             </div>
@@ -665,6 +717,7 @@
 
             const modalPrev = document.getElementById('modal-preview-soal');
             modalPrev.classList.remove('hidden');
+            document.getElementById('preview-scroll-body').scrollTop = 0;
             if (window.MathJax && window.MathJax.typesetPromise) {
                 MathJax.typesetPromise([modalPrev]).catch(() => {});
             }
@@ -677,10 +730,16 @@
         function bukaModalImportSoal() { document.getElementById('modal-import-soal').classList.remove('hidden'); }
         function tutupModalImportSoal() { document.getElementById('modal-import-soal').classList.add('hidden'); document.getElementById('file-excel-soal').value = ''; }
 
-        // KONVERTER NOTASI NATURAL EXCEL -> TAMPILAN RUMUS RAPI
+        // KONVERTER NOTASI NATURAL EXCEL -> TAMPILAN RUMUS RAPI (AMAN UNTUK TEKS ARAB)
         function formatRumusExcel(teks) {
             let str = String(teks || '').trim();
             if (!str) return '';
+
+            str = str.replace(/\r?\n/g, '<br>');
+
+            if (mengandungArab(str)) {
+                return str.replace(/\$([^$]+)\$/g, '\\($1\\)');
+            }
 
             str = str.replace(/\$([^$]+)\$/g, '\\($1\\)');
             const bagian = str.split(/(\\\([\s\S]*?\\\))/g);
@@ -846,8 +905,8 @@
                         jenis_soal: tipe,
                         teks_pertanyaan: teksSoalFormatted,
                         pertanyaan: teksSoalFormatted,
-                        bobot_nilai: parseInt(row.Bobot) || 1,
-                        bobot_skor: parseInt(row.Bobot) || 1,
+                        bobot_nilai: parseFloat(row.Bobot) || 1,
+                        bobot_skor: parseFloat(row.Bobot) || 1,
                         opsi_jawaban: opsiObj,
                         opsi: tipe === 'PG' ? JSON.stringify(opsiObj) : null,
                         kunci_jawaban: kunciStr,
@@ -897,7 +956,7 @@
 
             const id = document.getElementById('soal-id').value;
             const tipe = document.getElementById('soal-tipe').value;
-            const bobot = parseInt(document.getElementById('soal-bobot').value) || 1;
+            const bobot = parseFloat(document.getElementById('soal-bobot').value) || 1;
             let pertanyaanHtml = document.getElementById('soal-pertanyaan').value;
 
             const fileGambarManual = document.getElementById('soal-gambar-manual');
@@ -921,8 +980,9 @@
                 opsiObj = {};
                 for (const h of ['a', 'b', 'c', 'd', 'e']) {
                     let textOpsi = document.getElementById(`opsi-${h}`).value.trim();
+                    const gambarLama = document.getElementById(`opsi-${h}-img-lama`).value;
                     const uploadedImgOpsi = await uploadFileKeStorage(`opsi-${h}-img-file`, `opsi_${h}`);
-                    opsiObj[h.toUpperCase()] = { teks: textOpsi, gambar: uploadedImgOpsi || '' };
+                    opsiObj[h.toUpperCase()] = { teks: textOpsi, gambar: uploadedImgOpsi || gambarLama || '' };
                 }
                 kunci = document.getElementById('kunci-pg').value;
             }
@@ -979,7 +1039,7 @@
                 tbody.innerHTML += `
                     <tr class="hover:bg-gray-50 transition-colors border-b border-gray-100">
                         <td class="px-6 py-4 font-bold text-center text-gray-500">${index + 1}</td>
-                        <td class="px-6 py-4 text-gray-800 text-sm max-w-xl leading-relaxed">${teksRingkas}</td>
+                        <td dir="auto" class="px-6 py-4 text-gray-800 text-sm max-w-xl leading-relaxed ${kelasArab(teksRingkas)}">${teksRingkas}</td>
                         <td class="px-6 py-4"><span class="${(s.tipe_soal || s.tipe) === 'PG' ? 'bg-indigo-100 text-indigo-700' : 'bg-amber-100 text-amber-700'} px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">${(s.tipe_soal || s.tipe)}</span></td>
                         <td class="px-6 py-4 font-black text-center text-blue-600">${s.bobot_nilai || s.bobot_skor || 1}</td>
                         <td class="px-6 py-4 text-right whitespace-nowrap">

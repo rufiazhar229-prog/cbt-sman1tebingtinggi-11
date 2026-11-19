@@ -6,6 +6,8 @@
     <title>Ujian Berbasis Komputer - SMAN 1 Tebing Tinggi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Arab Berharakat Jelas (Noto Naskh Arabic) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script>
         window.MathJax = {
@@ -16,10 +18,17 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style> 
         html, body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', 'Noto Naskh Arabic', sans-serif;
             user-select: none;
             max-width: 100%;
             overflow-x: hidden;
+        }
+
+        /* Tampilan Teks Arab Berharakat agar Jelas & Rapi di HP maupun Laptop */
+        .teks-arab {
+            font-family: 'Noto Naskh Arabic', 'Inter', serif;
+            font-size: 1.4rem;
+            line-height: 2.25;
         }
 
         /* 1. PENYESUAIAN GAMBAR DI HP & PC (Otomatis muat dalam kartu) */
@@ -70,6 +79,10 @@
 
         /* 3. PENYESUAIAN KHUSUS LAYAR HP (< 640px) */
         @media (max-width: 640px) {
+            .teks-arab {
+                font-size: 1.3rem;
+                line-height: 2.2;
+            }
             main th,
             main td,
             #konten-pertanyaan th,
@@ -162,7 +175,7 @@
                     </div>
 
                     <!-- Teks Pertanyaan -->
-                    <div id="konten-pertanyaan" class="text-sm sm:text-base md:text-lg text-gray-900 leading-relaxed mb-6 min-h-[100px]">
+                    <div id="konten-pertanyaan" dir="auto" class="text-sm sm:text-base md:text-lg text-gray-900 leading-relaxed mb-6 min-h-[100px]">
                         Memuat pertanyaan...
                     </div>
 
@@ -172,7 +185,7 @@
                     <!-- Kotak Input Jawaban Esai -->
                     <div id="konten-esai" class="hidden space-y-2">
                         <label class="block text-xs font-bold text-gray-600 uppercase">Jawaban Uraian / Esai:</label>
-                        <textarea id="input-esai" rows="5" oninput="simpanJawabanEsai(this.value)" class="w-full bg-white border border-gray-300 rounded-xl p-4 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 leading-relaxed select-text" placeholder="Ketik jawaban esai Anda di sini... (Otomatis tersimpan)"></textarea>
+                        <textarea id="input-esai" dir="auto" rows="5" oninput="simpanJawabanEsai(this.value)" class="w-full bg-white border border-gray-300 rounded-xl p-4 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 leading-relaxed select-text" placeholder="Ketik jawaban esai Anda di sini... (Otomatis tersimpan)"></textarea>
                     </div>
                 </div>
 
@@ -228,6 +241,11 @@
         let initWidth = 0;
         let initHeight = 0;
         let sedangMengetikEsai = false;
+
+        // Helper deteksi karakter Arab (Unicode Arabic Block)
+        function mengandungArab(teks) {
+            return /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(String(teks || ''));
+        }
 
         if (!sessionSiswa) {
             window.location.href = "login_siswa.html";
@@ -298,7 +316,7 @@
 
         async function verifikasiStatusSebelumMulai() {
             await muatBatasPelanggaranGlobal();
-            setInterval(muatBatasPelanggaranGlobal, 15000);
+            setInterval(muatBatasPelanggaranGlobal, 30000);
 
             if (dataSiswa && dataSiswa.peserta_id) {
                 const { data: statusDb } = await db
@@ -326,14 +344,33 @@
         }
 
         async function muatSoalUjian() {
-            const idPaket = dataSiswa.id_paket; 
-            const { data, error } = await db.from('bank_soal').select('*').eq('id_paket', idPaket);
-            
-            if (error) {
-                console.error("Error dari Supabase:", error);
-                document.getElementById('konten-pertanyaan').innerHTML = `<p class="text-red-600 font-bold">Error Database: ${error.message}</p>`;
-                return;
+            const idPaket = dataSiswa.id_paket;
+            const cacheKey = `cache_soal_${idPaket}`;
+            let data = null;
+
+            // Cek cache browser terlebih dahulu agar hemat bandwidth Supabase saat refresh
+            const cachedSoal = sessionStorage.getItem(cacheKey);
+            if (cachedSoal) {
+                try {
+                    data = JSON.parse(cachedSoal);
+                } catch (e) {
+                    data = null;
+                }
             }
+
+            if (!data || data.length === 0) {
+                const res = await db.from('bank_soal').select('*').eq('id_paket', idPaket).order('id', { ascending: true });
+                if (res.error) {
+                    console.error("Error dari Supabase:", res.error);
+                    document.getElementById('konten-pertanyaan').innerHTML = `<p class="text-red-600 font-bold">Error Database: ${res.error.message}</p>`;
+                    return;
+                }
+                data = res.data;
+                if (data && data.length > 0) {
+                    try { sessionStorage.setItem(cacheKey, JSON.stringify(data)); } catch (e) {}
+                }
+            }
+
             if (!data || data.length === 0) {
                 document.getElementById('konten-pertanyaan').innerHTML = `<p class="text-amber-600 italic">Paket soal ini masih kosong. Silakan tambahkan soal melalui menu Admin.</p>`;
                 return;
@@ -388,7 +425,7 @@
             statusSimpan.classList.add('text-amber-600');
 
             const { data: existingData } = await db.from('jawaban_siswa')
-                .select('id').eq('id_peserta', dataSiswa.peserta_id).eq('id_soal', soal.id).single();
+                .select('id').eq('id_peserta', dataSiswa.peserta_id).eq('id_soal', soal.id).maybeSingle();
 
             let err = null;
             if (existingData) {
@@ -437,8 +474,12 @@
         function tampilkanSoal(i) {
             indexSoalAktif = i;
             const soal = daftarSoal[i];
+            const teksPertanyaan = soal.teks_pertanyaan || soal.pertanyaan || '';
             document.getElementById('lbl-nomor-soal').innerText = `Soal No. ${i + 1} dari ${daftarSoal.length}`;
-            document.getElementById('konten-pertanyaan').innerHTML = soal.teks_pertanyaan || soal.pertanyaan;
+            
+            const elPertanyaan = document.getElementById('konten-pertanyaan');
+            elPertanyaan.classList.toggle('teks-arab', mengandungArab(teksPertanyaan));
+            elPertanyaan.innerHTML = teksPertanyaan;
             document.getElementById('chk-ragu').checked = raguRagu[i] || false;
 
             const opsiContainer = document.getElementById('konten-opsi');
@@ -453,7 +494,9 @@
                 
                 const inputEsai = document.getElementById('input-esai');
                 if (inputEsai) {
-                    inputEsai.value = jawabanSiswa[i] || '';
+                    const valEsai = jawabanSiswa[i] || '';
+                    inputEsai.value = valEsai;
+                    inputEsai.classList.toggle('teks-arab', mengandungArab(valEsai));
                 }
             } else {
                 esaiContainer.classList.add('hidden');
@@ -464,6 +507,7 @@
                 ['A', 'B', 'C', 'D', 'E'].forEach(huruf => {
                     if (opsiData[huruf]) {
                         const teksOpsi = typeof opsiData[huruf] === 'object' ? (opsiData[huruf].teks || '') : opsiData[huruf];
+                        const isArabOpsi = mengandungArab(teksOpsi);
                         const gambarOpsi = (typeof opsiData[huruf] === 'object' && opsiData[huruf].gambar)
                             ? `<img src="${opsiData[huruf].gambar}" class="mt-2 max-h-40 rounded-lg border border-gray-200">`
                             : '';
@@ -474,9 +518,12 @@
 
                         opsiContainer.innerHTML += `
                             <label class="flex items-start p-3.5 rounded-xl border cursor-pointer transition-all ${bgActive}" onclick="pilihJawaban(${i}, '${huruf}')">
-                                <input type="radio" name="opsi_pilihan" value="${huruf}" ${isChecked} class="mt-1 mr-3 text-blue-600 focus:ring-blue-500">
-                                <div class="text-sm flex-1">
-                                    <div><span class="font-bold mr-2">${huruf}.</span> ${teksOpsi}</div>
+                                <div class="flex items-center shrink-0 pt-0.5 mr-3">
+                                    <input type="radio" name="opsi_pilihan" value="${huruf}" ${isChecked} class="mr-2.5 text-blue-600 focus:ring-blue-500">
+                                    <span class="font-bold text-sm">${huruf}.</span>
+                                </div>
+                                <div dir="auto" class="text-sm flex-1 min-w-0 ${isArabOpsi ? 'teks-arab' : ''}">
+                                    <div>${teksOpsi}</div>
                                     ${gambarOpsi}
                                 </div>
                             </label>
@@ -497,12 +544,16 @@
 
         function simpanJawabanEsai(teks) {
             jawabanSiswa[indexSoalAktif] = teks;
+            const inputEsai = document.getElementById('input-esai');
+            if (inputEsai) {
+                inputEsai.classList.toggle('teks-arab', mengandungArab(teks));
+            }
             renderNavigasiSoal();
             
             clearTimeout(timerEsai);
             timerEsai = setTimeout(() => {
                 simpanJawabanKeDB(indexSoalAktif);
-            }, 1000); 
+            }, 1200); 
         }
 
         function tandaiRagu() {
@@ -633,7 +684,7 @@
             if (!ujianGate.classList.contains('hidden')) return;
 
             jedaAntiDobel = true;
-            setTimeout(() => { jedaAntiDobel = false; }, 1500);
+            setTimeout(() => { jedaAntiDobel = false; }, 3000);
 
             await muatBatasPelanggaranGlobal();
             jumlahPelanggaran++;
@@ -696,6 +747,9 @@
             }
             if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
             alert(alasan === 'waktu_habis' ? "Waktu ujian habis. Jawaban telah dikumpulkan." : "Ujian berhasil diselesaikan!");
+            if (dataSiswa && dataSiswa.id_paket) {
+                sessionStorage.removeItem(`cache_soal_${dataSiswa.id_paket}`);
+            }
             localStorage.removeItem('siswaLogin');
             window.location.href = "login_siswa.html";
         }
