@@ -11,7 +11,10 @@
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script>
         window.MathJax = {
-            tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] },
+            tex: {
+                inlineMath: [['\\(', '\\)'], ['$', '$']],
+                displayMath: [['\\[', '\\]'], ['$$', '$$']]
+            },
             svg: { fontCache: 'global' }
         };
     </script>
@@ -42,13 +45,15 @@
         }
 
         /* 2. PENYESUAIAN TABEL DI HP & PC (Bergaris penuh & bisa digeser halus di HP) */
-        #konten-pertanyaan {
+        #konten-pertanyaan,
+        #konten-opsi {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             word-wrap: break-word;
         }
         main table,
         #konten-pertanyaan table,
+        #konten-opsi table,
         #area-soal table,
         .teks-soal table {
             border-collapse: collapse !important;
@@ -61,6 +66,8 @@
         main td,
         #konten-pertanyaan th,
         #konten-pertanyaan td,
+        #konten-opsi th,
+        #konten-opsi td,
         #area-soal th,
         #area-soal td,
         .teks-soal th,
@@ -71,6 +78,7 @@
         }
         main th,
         #konten-pertanyaan th,
+        #konten-opsi th,
         #area-soal th,
         .teks-soal th {
             background-color: #f1f5f9 !important;
@@ -86,7 +94,9 @@
             main th,
             main td,
             #konten-pertanyaan th,
-            #konten-pertanyaan td {
+            #konten-pertanyaan td,
+            #konten-opsi th,
+            #konten-opsi td {
                 padding: 6px 8px !important;
                 font-size: 12px !important;
                 white-space: nowrap;
@@ -191,11 +201,11 @@
 
                 <!-- Navigasi Bawah Soal -->
                 <div class="flex justify-between items-center pt-5 border-t border-gray-200 mt-6 gap-2">
-                    <button onclick="soalSebelumnya()" id="btn-sebelumnya" class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors flex items-center space-x-2 cursor-pointer">
+                    <button onclick="soalSebelumnya()" id="btn-sebelumnya" class="bg-gray-100 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed text-gray-700 border border-gray-300 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors flex items-center space-x-2 cursor-pointer">
                         <i class="fa-solid fa-arrow-left"></i>
                         <span>Sebelumnya</span>
                     </button>
-                    <button onclick="soalBerikutnya()" id="btn-berikutnya" class="bg-blue-600 hover:bg-blue-700 text-white px-5 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors flex items-center space-x-2 shadow-sm cursor-pointer">
+                    <button onclick="soalBerikutnya()" id="btn-berikutnya" class="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-5 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-colors flex items-center space-x-2 shadow-sm cursor-pointer">
                         <span>Selanjutnya</span>
                         <i class="fa-solid fa-arrow-right"></i>
                     </button>
@@ -466,6 +476,11 @@
                 `;
             });
 
+            const btnPrev = document.getElementById('btn-sebelumnya');
+            const btnNext = document.getElementById('btn-berikutnya');
+            if (btnPrev) btnPrev.disabled = (indexSoalAktif === 0);
+            if (btnNext) btnNext.disabled = (indexSoalAktif === daftarSoal.length - 1);
+
             const containerSelesai = document.getElementById('container-btn-selesai');
             if (indexSoalAktif === daftarSoal.length - 1) containerSelesai.classList.remove('hidden');
             else containerSelesai.classList.add('hidden');
@@ -503,7 +518,9 @@
                 opsiContainer.classList.remove('hidden');
                 opsiContainer.innerHTML = "";
                 
-                const opsiData = soal.opsi_jawaban || JSON.parse(soal.opsi || '{}');
+                const opsiData = typeof soal.opsi_jawaban === 'string'
+                    ? JSON.parse(soal.opsi_jawaban)
+                    : (soal.opsi_jawaban || JSON.parse(soal.opsi || '{}'));
                 ['A', 'B', 'C', 'D', 'E'].forEach(huruf => {
                     if (opsiData[huruf]) {
                         const teksOpsi = typeof opsiData[huruf] === 'object' ? (opsiData[huruf].teks || '') : opsiData[huruf];
@@ -532,7 +549,9 @@
                 });
             }
 
-            if (window.MathJax) { MathJax.typesetPromise(); }
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([elPertanyaan, opsiContainer]).catch(() => {});
+            }
             renderNavigasiSoal();
         }
         
