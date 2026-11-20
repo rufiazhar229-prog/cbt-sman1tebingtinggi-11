@@ -12,7 +12,10 @@
     <!-- Pustaka MathJax untuk Render Rumus Matematika -->
     <script>
         window.MathJax = {
-            tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] },
+            tex: {
+                inlineMath: [['\\(', '\\)'], ['$', '$']],
+                displayMath: [['\\[', '\\]'], ['$$', '$$']]
+            },
             svg: { fontCache: 'global' }
         };
     </script>
@@ -445,6 +448,7 @@
         let idPaketAktif = null;
         let namaPaketAktif = null;
         let targetInputEquation = 'tinymce';
+        window.daftarSoalPaket = [];
 
         // Helper deteksi karakter Arab (Unicode Arabic Block)
         function mengandungArab(teks) {
@@ -640,8 +644,11 @@
         function tutupModalSoal() { document.getElementById('modal-soal').classList.add('hidden'); }
         function gantiTipeSoal() { document.getElementById('area-pg').classList.toggle('hidden', document.getElementById('soal-tipe').value === 'ESAI'); }
         
-        function editSoal(sStr) {
-            const s = JSON.parse(decodeURIComponent(sStr));
+        // --- AMAN DARI TANDA KUTIP / TABEL HTML (AKSES VIA INDEKS ARRAY) ---
+        function editSoal(idx) {
+            const s = window.daftarSoalPaket[idx];
+            if (!s) return;
+
             document.getElementById('modal-title').innerHTML = `<i class="fa-solid fa-pen text-blue-600 mr-2"></i> Edit Butir Soal`;
             document.getElementById('soal-id').value = s.id;
             document.getElementById('soal-tipe').value = s.tipe_soal || s.tipe;
@@ -671,8 +678,10 @@
         }
 
         // --- FITUR PRATINJAU (VIEW) SOAL DI MENU AKSI ---
-        function bukaModalPreview(sStr) {
-            const s = JSON.parse(decodeURIComponent(sStr));
+        function bukaModalPreview(idx) {
+            const s = window.daftarSoalPaket[idx];
+            if (!s) return;
+
             const tipe = s.tipe_soal || s.tipe || 'PG';
             const teksSoal = s.teks_pertanyaan || s.pertanyaan || '-';
             
@@ -730,25 +739,27 @@
         function bukaModalImportSoal() { document.getElementById('modal-import-soal').classList.remove('hidden'); }
         function tutupModalImportSoal() { document.getElementById('modal-import-soal').classList.add('hidden'); document.getElementById('file-excel-soal').value = ''; }
 
-        // KONVERTER NOTASI NATURAL EXCEL -> TAMPILAN RUMUS RAPI (AMAN UNTUK TEKS ARAB)
+        // KONVERTER NOTASI NATURAL EXCEL -> TAMPILAN RUMUS RAPI (AMAN UNTUK TEKS ARAB, LATEX $$ & TABEL HTML)
         function formatRumusExcel(teks) {
             let str = String(teks || '').trim();
             if (!str) return '';
 
-            str = str.replace(/\r?\n/g, '<br>');
+            // 1. Konversi blok display math $$...$$ lebih dulu, baru inline math $...$
+            str = str.replace(/\$\$([\s\S]+?)\$\$/g, '\\[$1\\]');
+            str = str.replace(/\$([^\$\n]+?)\$/g, '\\($1\\)');
 
-            if (mengandungArab(str)) {
-                return str.replace(/\$([^$]+)\$/g, '\\($1\\)');
-            }
-
-            str = str.replace(/\$([^$]+)\$/g, '\\($1\\)');
-            const bagian = str.split(/(\\\([\s\S]*?\\\))/g);
+            // 2. Pisahkan blok rumus & tag HTML agar tidak ikut diubah oleh regex teks biasa
+            const bagian = str.split(/(\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|<[^>]+>)/g);
 
             return bagian.map(part => {
-                if (part.startsWith('\\(') && part.endsWith('\\)')) {
+                if (!part) return '';
+                if (part.startsWith('\\[') || part.startsWith('\\(') || (part.startsWith('<') && part.endsWith('>'))) {
                     return part;
                 }
-                return part
+                let bersih = part.replace(/\r?\n/g, '<br>');
+                if (mengandungArab(bersih)) return bersih;
+
+                return bersih
                     .replace(/([A-Za-z\)])(\d+)/g, '$1<sub>$2</sub>')
                     .replace(/\^\(([^)]+)\)/g, '<sup>$1</sup>')
                     .replace(/\^([A-Za-z0-9+\-]+)/g, '<sup>$1</sup>')
@@ -1020,11 +1031,13 @@
             const { data, error } = await db.from('bank_soal').select('*').eq('id_paket', idPaketAktif).order('id', { ascending: true });
             
             if (error || !data || data.length === 0) {
+                window.daftarSoalPaket = [];
                 tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-gray-400 italic">Belum ada soal di paket ini. Klik 'Ketik Manual' atau 'Import Excel' untuk memulai.</td></tr>`;
                 document.getElementById('counter-soal').innerText = "0 Soal";
                 return;
             }
             
+            window.daftarSoalPaket = data;
             document.getElementById('counter-soal').innerText = `${data.length} Soal`;
             tbody.innerHTML = "";
             
@@ -1034,7 +1047,6 @@
                     .replace(/<img[^>]*>/gi, ' [Gambar] ')
                     .replace(/<\/?(p|div|br)[^>]*>/gi, ' ')
                     .trim();
-                const stringData = encodeURIComponent(JSON.stringify(s));
                 
                 tbody.innerHTML += `
                     <tr class="hover:bg-gray-50 transition-colors border-b border-gray-100">
@@ -1043,10 +1055,10 @@
                         <td class="px-6 py-4"><span class="${(s.tipe_soal || s.tipe) === 'PG' ? 'bg-indigo-100 text-indigo-700' : 'bg-amber-100 text-amber-700'} px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">${(s.tipe_soal || s.tipe)}</span></td>
                         <td class="px-6 py-4 font-black text-center text-blue-600">${s.bobot_nilai || s.bobot_skor || 1}</td>
                         <td class="px-6 py-4 text-right whitespace-nowrap">
-                            <button type="button" onclick="bukaModalPreview('${stringData}')" class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-colors mr-1 cursor-pointer" title="Pratinjau Soal">
+                            <button type="button" onclick="bukaModalPreview(${index})" class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-colors mr-1 cursor-pointer" title="Pratinjau Soal">
                                 <i class="fa-solid fa-eye text-xs"></i>
                             </button>
-                            <button type="button" onclick="editSoal('${stringData}')" class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors mr-1 cursor-pointer" title="Edit Soal">
+                            <button type="button" onclick="editSoal(${index})" class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors mr-1 cursor-pointer" title="Edit Soal">
                                 <i class="fa-solid fa-pen-to-square text-xs"></i>
                             </button>
                             <button type="button" onclick="hapusSoal('${s.id}')" class="w-8 h-8 rounded-full bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors cursor-pointer" title="Hapus Soal">
